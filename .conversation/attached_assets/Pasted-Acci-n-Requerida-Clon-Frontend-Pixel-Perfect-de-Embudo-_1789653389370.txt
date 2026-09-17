@@ -1,0 +1,68 @@
+Acción Requerida: Clon Frontend Pixel-Perfect de Embudo de Cotización (Identidad Fondus)
+
+Eres un Desarrollador Frontend Senior experto en React, Vite y Tailwind CSS. Tu tarea es construir una Landing Page (SPA) que replique exactamente la estructura de maquetación de 2 columnas de la imagen de referencia, pero aplicando ESTRICTAMENTE el manual de marca de "Fondus".
+
+RESTRICCIÓN CRÍTICA: Esto es un DEMO FRONTEND. NO instales bases de datos ni backends. Simula los estados del formulario, los selectores y el resumen lateral usando useState de React.
+
+1. Sistema de Colores (Fondus):
+
+Fondo General: Blanco nieve o gris ultraclaro (bg-slate-50).
+
+Títulos principales y bordes de tarjetas: Celeste vibrante (text-sky-500, border-sky-500). Reemplaza todo el morado/violeta de la referencia por este celeste.
+
+Texto general y Logo: Azul marino corporativo (text-blue-900).
+
+Botones CTA (Continuar) y Banner de Urgencia: Verde institucional (bg-green-600 o #4CAF50). Reemplaza el amarillo/naranja de la referencia por este verde.
+
+2. Estructura de la Interfaz (Layout de 2 Columnas en Desktop, Apilado en Móvil):
+
+Header (Barra de Navegación):
+
+Izquierda: Logo de Fondus en azul.
+
+Centro: Links "NOSOTROS | PLANES | PRODUCTOS | PREGUNTAS FRECUENTES | INGRESAR" en azul marino, texto pequeño.
+
+Derecha: Íconos sociales (Facebook, Instagram, WhatsApp, TikTok) en celeste.
+
+Columna Izquierda (Contenido Principal - 65% del ancho en Desktop):
+
+Encabezado: Badge "Alta online" (borde celeste). Título gigante celeste: "Sumate a Fondus". Subtítulo azul: "Completá tus datos para sumarte a nuestro fondo de capitalización."
+
+Banner de Adjudicación (Diseño de tarjeta sólida):
+
+Fila superior (Fondo blanco, texto azul): "ÚLTIMO NÚMERO ADJUDICADO - Sorteo Agosto 2026" a la izquierda, y el número "390" gigante a la derecha (en celeste).
+
+Fila inferior (Fondo VERDE institucional, texto blanco): "PRÓXIMA ADJUDICACIÓN - Sábado 26 de septiembre - 21:00 hs". Debajo, un contador visual en 4 bloques: DÍAS | HORAS | MIN | SEG.
+
+Navegación de Pasos (Stepper): Tres pestañas estilo pill: "Datos personales" (Activa, fondo celeste suave), "Elegí tus números", "Aprobación".
+
+Formularios (Enmarcados con bordes muy finos color celeste/gris):
+
+Sección 1 - Elegí tu participación: Dropdown "Seleccionar plan" (Opciones: Moto 0KM, Auto 0KM, 20 Millones) y un input bloqueado al lado "Precio de cuota".
+
+Sección 2 - Datos personales: Inputs para Nombre completo, DNI, WhatsApp (dividido en Característica y Número), y Email.
+
+Sección 3 - Domicilio: Input largo "Buscar dirección", seguido de inputs más chicos: Calle, Altura, Depto, Barrio, Localidad, Provincia (Dropdown).
+
+Botones inferiores: Botón principal VERDE ("Continuar") y botón secundario con borde celeste ("Volver").
+
+Columna Derecha (Resumen Sticky - 35% del ancho en Desktop):
+
+Tarjeta fija al hacer scroll con borde celeste claro y fondo apenas tintado.
+
+Título: "RESUMEN" en celeste.
+
+Líneas divisorias con: "PARTICIPACIÓN", "Pago", y "Total primer pago" (Con valores simulados que se actualicen si el usuario elige un plan en la columna izquierda).
+
+Input para "Cupón de descuento" y botón "Aplicar" (borde celeste).
+
+Caja inferior de ayuda: "¿Necesitás ayuda? Escribinos por WhatsApp..." con ícono.
+
+Footer Institucional (Fondo VERDE o AZUL MARINO sólido):
+
+4 columnas: Logo/Contacto (Dirección en Córdoba, Teléfono), Navegación, Información Legal (Términos, Privacidad), y Atención al Asociado.
+
+Botones blancos obligatorios y destacados en la última columna: "Botón de Arrepentimiento" y "Baja de Servicio".
+
+3. Directivas Técnicas:
+Usa grid o flex para estructurar las dos columnas. La tarjeta de "Resumen" debe usar position: sticky; top: 2rem; para acompañar al usuario mientras completa el formulario largo. Crea componentes visualmente pulidos, con bordes rounded-2xl y usa lucide-react para la iconografía.
