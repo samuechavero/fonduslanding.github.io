@@ -7,7 +7,7 @@
     "dev": "pnpm --filter @workspace/fondus-cotizacion run dev",
     "build": "pnpm --filter @workspace/fondus-cotizacion run build && rm -rf dist && cp -r artifacts/fondus-cotizacion/dist dist",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -t true",
+    "deploy": "gh-pages -d dist -t",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
