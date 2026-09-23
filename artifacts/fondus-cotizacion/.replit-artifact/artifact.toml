@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Fondus — Embudo de Cotización"
+description = "Landing page responsive para completar la adhesión a Fondus con selección de plan, formulario de datos, contador de adjudicación y resumen de pago interactivo."
+version = "1.0.0"
+id = "artifacts/fondus-cotizacion"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19033
+
+[services.development]
+run = "pnpm --filter @workspace/fondus-cotizacion run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fondus-cotizacion", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/fondus-cotizacion/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19033"
+BASE_PATH = "/"
