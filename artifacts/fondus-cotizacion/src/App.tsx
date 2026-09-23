@@ -27,7 +27,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-
+import SocialProofToasts from './components/SocialProofToasts';
 type Plan = {
   id: string;
   title: string;
@@ -1237,6 +1237,9 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* Toasts dinámicos de prueba social */}
+      <SocialProofToasts />
     </div>
   );
 }
