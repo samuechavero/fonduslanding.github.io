@@ -2,9 +2,12 @@
   "name": "workspace",
   "version": "0.0.0",
   "license": "MIT",
+  "homepage": "https://samuechavero.github.io/fonduslanding.github.io/",
   "scripts": {
-    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
-    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "dev": "pnpm --filter @workspace/fondus-cotizacion run dev",
+    "build": "pnpm --filter @workspace/fondus-cotizacion run build && rm -rf dist && cp -r artifacts/fondus-cotizacion/dist dist",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -t true",
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
@@ -13,6 +16,7 @@
     "@replit/connectors-sdk": "^0.4.3"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "prettier": "^3.9.6",
     "typescript": "~5.9.3"
   }
