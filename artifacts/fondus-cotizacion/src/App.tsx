@@ -27,7 +27,8 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import SocialProofToasts from './components/SocialProofToasts';
+
+import SocialProof from './components/SocialProof';
 type Plan = {
   id: string;
   title: string;
@@ -1238,8 +1239,8 @@ function App() {
         </div>
       )}
 
-      {/* Toasts dinámicos de prueba social */}
-      <SocialProofToasts />
+      {/* Pop-ups dinámicos de prueba social */}
+      <SocialProof />
     </div>
   );
 }
