@@ -271,7 +271,7 @@ function AdjudicationBanner() {
 function Stepper({ step, setStep }: { step: number; setStep: (step: number) => void }) {
   const steps = ['1. Elegí tu plan', '2. Datos Personales', '3. Revisión y Checkout'];
   return (
-    <div className="mb-8 flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-sky-100 bg-white p-1.5 shadow-xs">
+    <div className="mb-8 w-full max-w-full flex items-center gap-1.5 overflow-x-auto whitespace-nowrap snap-x hide-scrollbar rounded-2xl border border-sky-100 bg-white p-1.5 shadow-xs">
       {steps.map((name, index) => {
         const active = step === index;
         const done = step > index;
@@ -280,12 +280,26 @@ function Stepper({ step, setStep }: { step: number; setStep: (step: number) => v
             key={name}
             type="button"
             onClick={() => (index <= step ? setStep(index) : undefined)}
-            className={`flex min-w-max flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-[12px] font-bold transition ${active ? 'bg-sky-50 text-blue-900 border border-sky-300 shadow-xs' : done ? 'text-green-700' : 'text-slate-400'}`}
+            className={`flex shrink-0 snap-start sm:flex-1 items-center justify-center gap-2 rounded-xl px-3.5 py-2.5 text-[12px] font-bold transition select-none ${
+              active
+                ? 'bg-sky-50 text-blue-900 border border-sky-300 shadow-xs'
+                : done
+                ? 'text-green-700 hover:bg-green-50/50'
+                : 'text-slate-400 hover:text-slate-600'
+            }`}
           >
-            <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${active ? 'bg-sky-500 text-white' : done ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+            <span
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] ${
+                active
+                  ? 'bg-sky-500 text-white font-extrabold'
+                  : done
+                  ? 'bg-green-100 text-green-700 font-bold'
+                  : 'bg-slate-100 text-slate-500'
+              }`}
+            >
               {done ? <Check size={12} strokeWidth={3} /> : index + 1}
             </span>
-            {name}
+            <span className="whitespace-nowrap">{name}</span>
           </button>
         );
       })}
@@ -308,7 +322,7 @@ function PlanCardSquare({
   return (
     <div
       onClick={onSelect}
-      className={`relative flex flex-col justify-between rounded-2xl border-2 p-5 text-left cursor-pointer transition-all duration-200 ${
+      className={`relative w-full flex flex-col justify-between rounded-2xl border-2 p-4 sm:p-5 text-left cursor-pointer transition-all duration-200 ${
         selected
           ? 'border-sky-500 bg-sky-50/50 shadow-md ring-2 ring-sky-500/20'
           : isFeatured
@@ -329,25 +343,28 @@ function PlanCardSquare({
           <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${selected ? 'border-sky-500' : 'border-slate-300'}`}>
             {selected && <span className="h-2.5 w-2.5 rounded-full bg-sky-500" />}
           </span>
-          <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-600 bg-sky-100/70 px-2 py-0.5 rounded-md">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plan Oficial</span>
+        </div>
+
+        {/* Nombre del plan y etiqueta de precio/objetivo: flex-col en móvil, md:flex-row */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-1">
+          <h3 className="font-display text-[15px] font-extrabold text-blue-900 leading-snug">
+            {plan.title}
+          </h3>
+          <span className="inline-block shrink-0 self-start md:self-auto rounded-md bg-sky-100/80 px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-sky-600 whitespace-nowrap">
             {plan.target}
           </span>
         </div>
 
-        {/* Título de la tarjeta */}
-        <h3 className="font-display text-[15px] font-extrabold text-blue-900 leading-snug">
-          {plan.title}
-        </h3>
-
         {/* Progresión de cuotas */}
         <div className="mt-4 space-y-2 rounded-xl border border-sky-100 bg-white p-3 shadow-xs">
-          <div className="flex items-baseline justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Cuotas 1 a 4:</span>
             <span className="font-mono-ui text-[16px] font-extrabold text-sky-500">
               {formatMoney(plan.quota1to4)}
             </span>
           </div>
-          <div className="flex items-baseline justify-between border-t border-slate-100 pt-1.5">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between border-t border-slate-100 pt-1.5 gap-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-green-700">Desde cuota 5:</span>
             <span className="font-mono-ui text-[16px] font-extrabold text-green-700">
               {formatMoney(plan.quota5on)}
@@ -375,9 +392,9 @@ function PlanCardSquare({
       <div className="mt-5 pt-2">
         <button
           type="button"
-          className={`w-full py-2 px-3 rounded-xl text-[12px] font-bold transition text-center ${
+          className={`w-full py-2.5 px-3 rounded-xl text-[12px] font-bold transition text-center ${
             selected
-              ? 'bg-sky-500 text-white'
+              ? 'bg-sky-500 text-white shadow-xs'
               : 'border border-sky-300 text-sky-600 hover:bg-sky-50'
           }`}
         >
@@ -480,10 +497,10 @@ function App() {
   };
 
   return (
-    <div className="fondus-page min-h-[100dvh] bg-slate-50 text-blue-900">
-      {/* Header Institucional */}
-      <header className="sticky top-0 z-20 border-b border-sky-100 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-10">
+    <div className="fondus-page min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-50 text-blue-900">
+      {/* Header Institucional con padding horizontal uniforme */}
+      <header className="sticky top-0 z-20 w-full border-b border-sky-100 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
+        <div className="mx-auto flex h-[72px] max-w-[1380px] items-center justify-between gap-4">
           <a href="#inicio" aria-label="Fondus inicio"><Logo /></a>
           <nav className="hidden items-center gap-6 lg:flex">
             {['Nosotros', 'Planes', 'Productos', 'Preguntas frecuentes'].map((link) => (
@@ -507,7 +524,7 @@ function App() {
           </button>
         </div>
         {mobileMenu && (
-          <div className="border-t border-sky-100 bg-white px-5 py-4 lg:hidden">
+          <div className="border-t border-sky-100 bg-white py-4 lg:hidden">
             <div className="grid gap-3 text-[12px] font-bold uppercase tracking-[.08em] text-blue-900">
               {['Nosotros', 'Planes', 'Productos', 'Preguntas frecuentes', 'Ingresar'].map((link) => (
                 <a key={link} href={`#${link.toLowerCase().replaceAll(' ', '-')}`} onClick={() => setMobileMenu(false)}>{link}</a>
@@ -517,19 +534,19 @@ function App() {
         )}
       </header>
 
-      {/* Main Container */}
-      <main id="inicio" className="bg-grid">
-        <div className="mx-auto max-w-[1380px] px-5 pb-16 pt-12 sm:px-8 sm:pt-16 lg:px-10 lg:pt-20">
+      {/* Main Container con overflow-x-hidden preventivo */}
+      <main id="inicio" className="w-full max-w-full overflow-x-hidden bg-grid">
+        <div className="mx-auto w-full max-w-[1380px] px-4 pb-16 pt-8 sm:px-6 sm:pt-14 lg:px-10 lg:pt-20">
           
           {/* Encabezado: Badge "Adhesión digital" y Título "Sumate a Fondus" */}
           <div className="mb-10 max-w-[740px] animate-rise">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-500 bg-sky-50 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[.15em] text-sky-500">
               <span className="h-1.5 w-1.5 rounded-full bg-sky-500" /> Adhesión digital
             </div>
-            <h1 className="font-display text-[clamp(42px,6vw,76px)] font-extrabold leading-[.98] tracking-[-.075em] text-sky-500">
+            <h1 className="font-display text-[clamp(36px,6vw,76px)] font-extrabold leading-[.98] tracking-[-.075em] text-sky-500">
               Sumate a <span className="text-blue-900">Fondus.</span>
             </h1>
-            <p className="mt-5 max-w-[560px] text-[17px] leading-relaxed text-blue-900/80 font-medium">
+            <p className="mt-5 max-w-[560px] text-[15px] sm:text-[17px] leading-relaxed text-blue-900/80 font-medium">
               Completá tus datos para sumarte a nuestro fondo de capitalización y ahorro.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-semibold text-slate-500">
@@ -541,10 +558,10 @@ function App() {
           <AdjudicationBanner />
 
           {/* 2 Column Layout (Izquierda 65% / Derecha 35% en Desktop) */}
-          <div id="cotizar" className="mt-12 grid items-start gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(315px,.85fr)] lg:gap-12">
+          <div id="cotizar" className="mt-12 grid items-start gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(315px,.85fr)] lg:gap-12 w-full max-w-full">
             
             {/* Columna Izquierda: Contenido y Stepper */}
-            <section>
+            <section className="w-full min-w-0">
               <Stepper step={step} setStep={setStep} />
               
               <div className="mb-5 flex items-center gap-3">
@@ -556,8 +573,8 @@ function App() {
 
               {/* SECCIÓN 1: ELEGÍ TU PLAN (3 Tarjetas Cuadradas Independientes) */}
               {step === 0 && (
-                <div className="animate-rise space-y-6">
-                  <section className="rounded-2xl border border-sky-200 bg-white p-5 shadow-xs sm:p-7">
+                <div className="animate-rise space-y-6 w-full max-w-full">
+                  <section className="w-full rounded-2xl border border-sky-200 bg-white p-4 shadow-xs sm:p-6 lg:p-7">
                     <SectionHeading
                       number="01"
                       title="Elegí tu plan"
@@ -565,8 +582,8 @@ function App() {
                       icon={<CreditCard size={18} />}
                     />
                     
-                    {/* Renderiza 3 tarjetas cuadradas independientes */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Renderiza 3 tarjetas cuadradas independientes con ancho completo */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                       {plans.map((planItem) => (
                         <PlanCardSquare
                           key={planItem.id}
@@ -582,8 +599,8 @@ function App() {
 
               {/* SECCIÓN 2: DATOS PERSONALES (Nombre, DNI, WhatsApp, Email) */}
               {step === 1 && (
-                <div className="animate-rise space-y-6">
-                  <section className="rounded-2xl border border-sky-200 bg-white p-5 shadow-xs sm:p-7">
+                <div className="animate-rise space-y-6 w-full max-w-full">
+                  <section className="w-full rounded-2xl border border-sky-200 bg-white p-4 shadow-xs sm:p-6 lg:p-7">
                     <SectionHeading
                       number="02"
                       title="Datos Personales"
@@ -636,8 +653,8 @@ function App() {
 
               {/* SECCIÓN 3: REVISIÓN Y CHECKOUT */}
               {step === 2 && (
-                <div className="animate-rise space-y-6">
-                  <section className="rounded-2xl border border-sky-200 bg-white p-5 shadow-xs sm:p-7">
+                <div className="animate-rise space-y-6 w-full max-w-full">
+                  <section className="w-full rounded-2xl border border-sky-200 bg-white p-4 shadow-xs sm:p-6 lg:p-7">
                     <SectionHeading
                       number="03"
                       title="Revisión y Checkout"

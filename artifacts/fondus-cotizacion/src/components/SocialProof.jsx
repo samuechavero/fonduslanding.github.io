@@ -76,8 +76,8 @@ export default function SocialProof() {
       {isVisible && toast && (
         <div
           key={toast.id}
-          className={`fixed bottom-4 z-50 pointer-events-none max-w-[340px] sm:max-w-[370px] w-[calc(100vw-2rem)] ${
-            toast.position === 'left' ? 'left-4' : 'right-4'
+          className={`fixed bottom-4 z-50 pointer-events-none max-w-[calc(100vw-2rem)] sm:max-w-[370px] w-auto ${
+            toast.position === 'left' ? 'left-4 right-auto' : 'right-4 left-auto'
           }`}
         >
           <motion.div
