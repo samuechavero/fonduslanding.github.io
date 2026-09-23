@@ -146,13 +146,15 @@ function downloadDocumentoLegal(nombreDoc: string) {
 }
 
 function Logo({ light = false }: { light?: boolean }) {
+  const logoUrl = `${import.meta.env.BASE_URL}fondus-logo.png`;
   return (
     <div className={`flex items-center gap-2.5 ${light ? 'text-white' : 'text-blue-900'}`}>
-      <span className="relative flex h-9 w-9 items-center justify-center rounded-[11px] bg-sky-500 text-[25px] font-extrabold leading-none text-white shadow-[0_6px_14px_rgba(14,165,233,.25)]">
-        f
-        <span className="absolute -bottom-0.5 right-1.5 h-1.5 w-1.5 rounded-full bg-green-500" />
-      </span>
-      <span className="font-display text-[25px] font-extrabold tracking-[-0.07em]">fondus</span>
+      <img
+        src={logoUrl}
+        alt="Fondus Logo"
+        className="h-9 w-9 rounded-xl object-contain shadow-xs border border-white/20"
+      />
+      <span className="font-display text-[25px] font-extrabold tracking-[-0.06em]">fondus</span>
     </div>
   );
 }
@@ -779,7 +781,10 @@ function App() {
               <section className="overflow-hidden rounded-2xl border border-sky-200 bg-white shadow-sm">
                 <div className="border-b border-sky-100 bg-sky-50/50 px-5 py-5 sm:px-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="font-display text-[16px] font-extrabold text-blue-900">Resumen</h2>
+                    <h2 className="font-display text-[16px] font-extrabold text-blue-900 flex items-center gap-2">
+                      <img src={`${import.meta.env.BASE_URL}fondus-logo.png`} alt="Fondus" className="h-5 w-5 rounded-md object-contain" />
+                      Resumen
+                    </h2>
                     <span className="flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-[10px] font-bold text-green-700 border border-green-200">
                       <LockKeyhole size={11} /> Seguro
                     </span>
@@ -986,8 +991,8 @@ function App() {
       {retentionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-900/60 p-4 backdrop-blur-sm animate-rise">
           <div className="relative w-full max-w-[480px] rounded-3xl bg-white p-7 text-center shadow-2xl border border-sky-200">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100 text-green-700 mb-4 shadow-inner">
-              <Gift size={32} strokeWidth={2.2} />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl overflow-hidden shadow-sm mb-4 border border-sky-200 bg-white">
+              <img src={`${import.meta.env.BASE_URL}fondus-logo.png`} alt="Fondus" className="h-full w-full object-contain" />
             </div>
 
             <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 border border-green-300 px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[.1em] text-green-800">
@@ -1022,8 +1027,11 @@ function App() {
       {successModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-900/60 p-4 backdrop-blur-sm animate-rise">
           <div className="relative w-full max-w-[500px] rounded-3xl bg-white p-6 sm:p-8 text-center shadow-2xl border border-green-300">
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100 text-green-700 shadow-inner">
-              <BadgeCheck size={36} strokeWidth={2.2} />
+            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm overflow-hidden border border-green-300 bg-white">
+              <img src={`${import.meta.env.BASE_URL}fondus-logo.png`} alt="Fondus" className="h-full w-full object-contain" />
+              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-white shadow-xs">
+                <Check size={14} strokeWidth={3} />
+              </span>
             </div>
 
             <div className="mt-4">
@@ -1115,8 +1123,8 @@ function App() {
             {!arrepentimientoSent ? (
               <form onSubmit={handleSendArrepentimiento} className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-500">
-                    <Mail size={22} />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl overflow-hidden shadow-xs border border-sky-100 bg-white">
+                    <img src={`${import.meta.env.BASE_URL}fondus-logo.png`} alt="Fondus" className="h-full w-full object-contain" />
                   </div>
                   <div>
                     <h2 className="font-display text-[20px] font-extrabold text-blue-900">
