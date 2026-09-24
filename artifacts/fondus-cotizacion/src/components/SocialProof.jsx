@@ -29,11 +29,17 @@ const planes = [
   'Auto 0KM',
 ];
 
-export default function SocialProof() {
+export default function SocialProof({ hidden = false }) {
   const [toast, setToast] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (hidden) {
+      setIsVisible(false);
+      setToast(null);
+      return;
+    }
+
     let hideTimeout;
 
     const triggerToast = () => {
@@ -41,7 +47,6 @@ export default function SocialProof() {
       const randomLocation = ubicaciones[Math.floor(Math.random() * ubicaciones.length)];
       const randomPlan = planes[Math.floor(Math.random() * planes.length)];
       
-      // Alterna o elige aleatoriamente entre la esquina inferior izquierda y la derecha
       const position = Math.random() > 0.5 ? 'left' : 'right';
 
       setToast({
@@ -53,23 +58,26 @@ export default function SocialProof() {
       });
       setIsVisible(true);
 
-      // Permanece en pantalla 2.5 segundos y se desvanece suavemente antes del intervalo de 3s
+      // Permanece en pantalla 4.5 segundos antes de desvanecerse
       hideTimeout = setTimeout(() => {
         setIsVisible(false);
-      }, 2500);
+      }, 4500);
     };
 
-    // Primer disparo inmediato
-    triggerToast();
+    // Primer disparo a los 2 segundos
+    const initialTimeout = setTimeout(triggerToast, 2000);
 
-    // Intervalo exacto de 3000ms (3 segundos)
-    const interval = setInterval(triggerToast, 3000);
+    // Intervalo exacto de 10000ms (10 segundos)
+    const interval = setInterval(triggerToast, 10000);
 
     return () => {
+      clearTimeout(initialTimeout);
       clearInterval(interval);
       clearTimeout(hideTimeout);
     };
-  }, []);
+  }, [hidden]);
+
+  if (hidden) return null;
 
   return (
     <AnimatePresence>
@@ -85,24 +93,24 @@ export default function SocialProof() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0, transition: { duration: 0.4, ease: 'easeInOut' } }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-white/95 backdrop-blur-md border border-sky-100 border-l-4 border-l-green-500 p-3.5 shadow-xl"
+            className="pointer-events-auto flex items-center gap-3 rounded-2xl bg-white/95 backdrop-blur-md border border-[#1d497f]/15 border-l-4 border-l-[#93c46d] p-3.5 shadow-xl"
           >
-            {/* Ícono de validación en verde institucional */}
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600 shadow-inner">
-              <CheckCircle2 size={22} strokeWidth={2.4} />
+            {/* Ícono de validación en verde Fondus */}
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#93c46d]/20 text-[#1d497f] shadow-inner">
+              <CheckCircle2 size={22} strokeWidth={2.4} className="text-[#1d497f]" />
             </div>
 
             {/* Contenido con copy estructurado */}
             <div className="min-w-0 flex-1">
-              {/* Título (Azul marino): "[Nombre] de [Ubicación]" */}
-              <h4 className="text-[13px] font-bold text-blue-900 leading-tight truncate">
+              {/* Título: "[Nombre] de [Ubicación]" */}
+              <h4 className="text-[13px] font-bold text-[#1d497f] leading-tight truncate">
                 {toast.name} de {toast.location}
               </h4>
 
-              {/* Cuerpo (Gris oscuro): "Se acaba de adherir al plan de [Plan]" */}
-              <p className="mt-0.5 text-[12px] text-gray-700 leading-snug">
+              {/* Cuerpo: "Se acaba de adherir al plan de [Plan]" */}
+              <p className="mt-0.5 text-[12px] text-slate-700 leading-snug">
                 Se acaba de adherir al plan de{' '}
-                <span className="font-bold text-blue-900">{toast.plan}</span>
+                <span className="font-bold text-[#1d497f]">{toast.plan}</span>
               </p>
             </div>
           </motion.div>

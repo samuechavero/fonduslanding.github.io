@@ -146,9 +146,15 @@
   .font-mono-ui { font-family: var(--app-font-mono); }
   .text-balance { text-wrap: balance; }
   .bg-grid {
-    background-image: linear-gradient(rgba(32, 178, 226, 0.055) 1px, transparent 1px), linear-gradient(90deg, rgba(32, 178, 226, 0.055) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(29, 73, 127, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(29, 73, 127, 0.045) 1px, transparent 1px);
     background-size: 32px 32px;
   }
+  .bg-fondus-blue { background-color: #1d497f; }
+  .text-fondus-blue { color: #1d497f; }
+  .border-fondus-blue { border-color: #1d497f; }
+  .bg-fondus-green { background-color: #93c46d; }
+  .text-fondus-green { color: #93c46d; }
+  .border-fondus-green { border-color: #93c46d; }
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
