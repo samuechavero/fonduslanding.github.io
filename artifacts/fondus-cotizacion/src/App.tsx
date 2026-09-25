@@ -80,30 +80,51 @@ function formatMoney(value: number) {
   return `$ ${new Intl.NumberFormat('es-AR').format(value)}`;
 }
 
-// 7. Fechas de Sorteo: Función JS que calcula "El último sábado del mes actual"
-// Si la fecha actual es mayor a ese sábado, muestra el último sábado del mes siguiente.
-function getProximoSorteoInfo() {
-  const now = new Date();
+// 7. Lógica Dinámica de Fechas para Contador de Adjudicación (Fondus)
+// Reglas del Negocio:
+// - El sorteo se realiza indefectiblemente el último sábado de cada mes a las 21:00 hs.
+// - El límite de tiempo para ingresar y participar en el sorteo del mes en curso es el último miércoles de ese mismo mes a las 23:59 hs.
 
-  const getLastSaturdayOfMonth = (year: number, month: number): Date => {
-    // Día 0 del mes siguiente es el último día del mes actual
-    const lastDay = new Date(year, month + 1, 0);
-    const dayOfWeek = lastDay.getDay(); // 0 Domingo, 6 Sábado
-    const daysToSubtract = (dayOfWeek + 1) % 7;
-    const lastSatDate = lastDay.getDate() - (dayOfWeek === 6 ? 0 : daysToSubtract);
-    return new Date(year, month, lastSatDate, 21, 0, 0);
-  };
+function getLastSaturdayOfMonth(year: number, month: number): Date {
+  // Día 0 del mes siguiente es el último día del mes actual
+  const lastDay = new Date(year, month + 1, 0);
+  const dayOfWeek = lastDay.getDay(); // 0 Domingo, 6 Sábado
+  const daysToSubtract = (dayOfWeek + 1) % 7;
+  const lastSatDate = lastDay.getDate() - daysToSubtract;
+  return new Date(year, month, lastSatDate, 21, 0, 0, 0);
+}
 
+function getLastWednesdayOfMonth(year: number, month: number): Date {
+  const lastDay = new Date(year, month + 1, 0);
+  const dayOfWeek = lastDay.getDay(); // 0 Domingo, 3 Miércoles, 6 Sábado
+  const daysToSubtract = (dayOfWeek + 4) % 7;
+  const lastWedDate = lastDay.getDate() - daysToSubtract;
+  return new Date(year, month, lastWedDate, 23, 59, 59, 999);
+}
+
+function getFechaObjetivoSorteo(now: Date = new Date()): Date {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  let sorteoDate = getLastSaturdayOfMonth(currentYear, currentMonth);
 
-  // Si hoy es mayor a ese sábado a las 21:00 hs, calcular el del mes siguiente
-  if (now.getTime() > sorteoDate.getTime()) {
+  // Obtén la fecha del último miércoles y la del último sábado del mes actual
+  const ultimoMiercoles = getLastWednesdayOfMonth(currentYear, currentMonth);
+  const ultimoSabadoMesActual = getLastSaturdayOfMonth(currentYear, currentMonth);
+
+  // Si la fecha y hora actual (new Date()) es mayor al último miércoles del mes,
+  // la variable de la fecha objetivo debe pasar a ser automáticamente el último sábado del mes siguiente.
+  // También si ya superó el horario del sorteo del sábado del mes actual.
+  if (now.getTime() > ultimoMiercoles.getTime() || now.getTime() > ultimoSabadoMesActual.getTime()) {
     const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
     const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-    sorteoDate = getLastSaturdayOfMonth(nextYear, nextMonth);
+    return getLastSaturdayOfMonth(nextYear, nextMonth);
   }
+
+  // Si la fecha actual es anterior o igual al último miércoles, la fecha objetivo se mantiene en el último sábado del mes actual.
+  return ultimoSabadoMesActual;
+}
+
+function getProximoSorteoInfo(now: Date = new Date()) {
+  const sorteoDate = getFechaObjetivoSorteo(now);
 
   const prevMonthDate = new Date(sorteoDate.getFullYear(), sorteoDate.getMonth() - 1, 1);
   const meses = [
@@ -320,21 +341,27 @@ function SectionHeading({
   );
 }
 
-function Countdown({ targetTime }: { targetTime: number }) {
+function Countdown({ targetTime }: { targetTime?: number }) {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const tick = () => {
-      const distance = Math.max(0, targetTime - Date.now());
+      const now = new Date();
+      // Si no se provee targetTime explícito, calcula la fecha objetivo dinámicamente
+      const target = targetTime ? new Date(targetTime) : getFechaObjetivoSorteo(now);
+      const distance = Math.max(0, target.getTime() - now.getTime());
+
       setTime({
-        days: Math.floor(distance / 86400000),
-        hours: Math.floor((distance / 3600000) % 24),
-        minutes: Math.floor((distance / 60000) % 60),
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((distance / (1000 * 60)) % 60),
         seconds: Math.floor((distance / 1000) % 60),
       });
     };
+
     tick();
     const interval = window.setInterval(tick, 1000);
+
     return () => window.clearInterval(interval);
   }, [targetTime]);
 
@@ -363,10 +390,22 @@ function Countdown({ targetTime }: { targetTime: number }) {
 }
 
 function AdjudicationBanner({
-  sorteoInfo,
+  sorteoInfo: initialSorteoInfo,
 }: {
-  sorteoInfo: { sorteoDate: Date; fechaTexto: string; ultimoSorteoTexto: string };
+  sorteoInfo?: { sorteoDate: Date; fechaTexto: string; ultimoSorteoTexto: string };
 }) {
+  const [currentSorteoInfo, setCurrentSorteoInfo] = useState(
+    () => initialSorteoInfo || getProximoSorteoInfo()
+  );
+
+  useEffect(() => {
+    const checkUpdate = () => {
+      setCurrentSorteoInfo(getProximoSorteoInfo());
+    };
+    const interval = setInterval(checkUpdate, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="overflow-hidden rounded-2xl border border-[#1d497f]/15 bg-white shadow-sm">
       <div className="flex items-center justify-between gap-4 px-5 py-5 sm:px-7">
@@ -375,7 +414,7 @@ function AdjudicationBanner({
             Último número adjudicado
           </p>
           <p className="text-[13px] font-semibold text-[#1d497f]">
-            {sorteoInfo.ultimoSorteoTexto}
+            {currentSorteoInfo.ultimoSorteoTexto}
           </p>
         </div>
         <span className="font-mono-ui text-[40px] font-bold leading-none tracking-[-.08em] text-[#1d497f]">
@@ -390,9 +429,9 @@ function AdjudicationBanner({
             Próxima adjudicación
           </div>
           <p className="mt-1 text-[14px] font-semibold text-white">
-            {sorteoInfo.fechaTexto}
+            {currentSorteoInfo.fechaTexto}
           </p>
-          <Countdown targetTime={sorteoInfo.sorteoDate.getTime()} />
+          <Countdown targetTime={currentSorteoInfo.sorteoDate.getTime()} />
         </div>
       </div>
     </section>
