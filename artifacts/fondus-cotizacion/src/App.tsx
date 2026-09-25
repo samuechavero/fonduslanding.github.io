@@ -30,6 +30,10 @@ import {
 
 import SocialProof from './components/SocialProof';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+// Configuración del worker de PDF.js para Vite
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 type Plan = {
   id: string;
@@ -620,6 +624,15 @@ function App() {
 
   // Visor Multimedia en Modal Interno (PDF e Imágenes)
   const [activeDocument, setActiveDocument] = useState<string | null>(null);
+  const [numPdfPages, setNumPdfPages] = useState<number | null>(null);
+
+  useEffect(() => {
+    setNumPdfPages(null);
+  }, [activeDocument]);
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPdfPages(numPages);
+  };
 
   const getDocumentTitle = (url: string | null) => {
     if (!url) return 'Documento Legal';
@@ -1861,13 +1874,31 @@ function App() {
                     </TransformWrapper>
                   </div>
                 ) : (
-                  <div className="w-full h-full overflow-auto touch-auto [-webkit-overflow-scrolling:touch]">
-                    <iframe
-                      src={getDocumentSrc(activeDocument)}
-                      className="w-full min-h-[85vh] border-none"
-                      title="Documento Legal Fondus"
-                    />
-                  </div>
+                  <TransformWrapper initialScale={1} minScale={1} maxScale={4}>
+                    <TransformComponent 
+                      wrapperClass="w-full h-full overflow-auto touch-pan-x touch-pan-y" 
+                      contentClass="w-full flex justify-center items-center bg-gray-100 min-h-full"
+                    >
+                      <Document 
+                        file={getDocumentSrc(activeDocument)} 
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        className="flex flex-col items-center max-w-full py-4 gap-4"
+                        loading={<div className="p-10 text-gray-500 font-medium">Cargando documento seguro...</div>}
+                        error={<div className="p-10 text-rose-500 font-medium">No se pudo cargar el documento PDF.</div>}
+                      >
+                        {Array.from(new Array(numPdfPages || 1), (_, index) => (
+                          <Page 
+                            key={`page_${index + 1}`}
+                            pageNumber={index + 1} 
+                            renderTextLayer={false} 
+                            renderAnnotationLayer={false} 
+                            width={window.innerWidth > 768 ? 700 : window.innerWidth - 40} 
+                            className="shadow-lg mb-4"
+                          />
+                        ))}
+                      </Document>
+                    </TransformComponent>
+                  </TransformWrapper>
                 )}
               </div>
             </motion.div>
