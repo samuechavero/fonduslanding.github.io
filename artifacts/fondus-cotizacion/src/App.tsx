@@ -173,6 +173,54 @@ function LegalModal({
   );
 }
 
+// Bloque Oficial de Certificación IGJ (Inspección General de Justicia)
+function IgjCertificationBlock({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`flex flex-col md:flex-row items-center justify-center bg-gray-100 rounded-2xl p-4 sm:p-6 shadow-xs border border-slate-200/80 ${className}`}
+    >
+      {/* 2. Bloque Izquierdo (Identidad Gubernamental) */}
+      <div className="flex flex-col gap-2 items-center md:items-start">
+        {/* Parte superior: Texto IGJ + Logotipo circular azul */}
+        <div className="flex items-center gap-3">
+          <span className="text-4xl font-bold text-black tracking-tight leading-none">
+            IGJ
+          </span>
+          <img
+            src={`${import.meta.env.BASE_URL}igj-logo.png`}
+            alt="Logotipo circular IGJ"
+            className="h-11 w-11 object-contain shrink-0"
+          />
+        </div>
+
+        {/* Parte inferior: Escudo argentino + Ministerio de Justicia */}
+        <div className="flex items-center gap-2">
+          <img
+            src={`${import.meta.env.BASE_URL}escudo-argentina.png`}
+            alt="Escudo Argentino"
+            className="h-8 w-auto object-contain shrink-0"
+          />
+          <div className="text-[10px] leading-tight text-black border-b border-black/80 pb-0.5">
+            <p>Ministerio de</p>
+            <p>Justicia y Derechos Humanos</p>
+            <p className="font-semibold">Presidencia de la Nación</p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Divisor Vertical Central (responsivo) */}
+      <div className="h-1 w-20 md:h-16 md:w-1.5 bg-black my-4 md:my-0 md:mx-6 shrink-0 rounded-full" />
+
+      {/* 4. Bloque Derecho (Resolución y Atención) */}
+      <div className="flex flex-col text-center md:text-left text-black">
+        <span className="text-xs font-bold leading-tight">Planes Aprobados</span>
+        <span className="text-sm font-normal leading-snug">RES 000289/11</span>
+        <span className="text-sm font-normal leading-snug">0800-3333-445</span>
+      </div>
+    </div>
+  );
+}
+
 // 1. Logo con subtítulo "Agencia Digital" estrictamente debajo del logo
 function Logo({ light = false }: { light?: boolean }) {
   const logoUrl = `${import.meta.env.BASE_URL}fondus-logo.png`;
@@ -1425,8 +1473,13 @@ function App() {
             </div>
           </div>
 
+          {/* Bloque Oficial IGJ */}
+          <div className="mt-10 flex justify-center">
+            <IgjCertificationBlock className="w-full max-w-[540px]" />
+          </div>
+
           {/* TEXTOS FIJOS OBLIGATORIOS EN FOOTER */}
-          <div className="mt-12 pt-8 border-t border-white/15">
+          <div className="mt-8 pt-8 border-t border-white/15">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center sm:text-left">
               <div className="grid gap-2 text-[12px] font-semibold text-white/85 sm:grid-cols-3">
                 <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -1878,18 +1931,9 @@ function App() {
             En caso de que Lotería de la Ciudad de Buenos Aires (LOTBA S.E.) no efectuase el último sábado "sorteos de lotería" se tomará para la adjudicación el que realice Lotería de la Ciudad de Buenos Aires (LOTBA S.E.) para sí el último sábado de cada mes como última jugada de Quiniela. Si Lotería de la Ciudad de Buenos Aires (LOTBA S.E.) no realizará para sí, el último sábado de cada mes sorteos de Lotería o Quiniela, se tomará para la adjudicación, el primer sorteo de Quiniela que realice para sí Lotería de la Ciudad de Buenos Aires (LOTBA S.E.) con posterioridad al último sábado sin sorteo.
           </p>
 
-          {/* Pie del Modal con Logotipo IGJ, Data Fiscal y Planes Aprobados */}
-          <div className="mt-6 rounded-2xl bg-slate-100 p-4 sm:p-5 border border-slate-200">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <img
-                src={`${import.meta.env.BASE_URL}igj-data-fiscal.png`}
-                alt="IGJ - Planes Aprobados RES 000289/11 - Data Fiscal"
-                className="max-h-20 sm:max-h-24 w-auto object-contain rounded"
-              />
-            </div>
-            <p className="mt-2 text-center text-[10.5px] font-bold uppercase tracking-wider text-slate-500">
-              Inspección General de Justicia · Planes Aprobados RES 000289/11 · Tel: 0800-3333-445
-            </p>
+          {/* Bloque Oficial IGJ */}
+          <div className="mt-6">
+            <IgjCertificationBlock className="w-full" />
           </div>
         </div>
       </LegalModal>
@@ -1929,6 +1973,11 @@ function App() {
             <p>
               <strong className="text-[#1d497f] font-bold">f-</strong> La participación determinada en (e) se adicionará mensualmente a la Reserva Matemática del Titular, pero se contabilizará en forma separada a efectos de su mejor individualización. La participación en los resultados financieros determinada mediante el procedimiento indicado en el presente artículo, será invertida conjuntamente con la Reserva Matemática de cada Titular y participará de los rendimientos mensuales de las inversiones en los meses sucesivos. Al formar parte de la Reserva Matemática esta participación se cobrará: 1- en el momento en que el Titular solicite el Rescate, según el artículo octavo; ó 2- cuando salga favorecido por sorteo en la proporción correspondiente a la Reserva Matemática alcanzada ó 3- al final del vencimiento del plazo del contrato, según el artículo cuarto.
             </p>
+          </div>
+
+          {/* Bloque Oficial IGJ */}
+          <div className="mt-6">
+            <IgjCertificationBlock className="w-full" />
           </div>
         </div>
       </LegalModal>
