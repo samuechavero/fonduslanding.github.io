@@ -1203,7 +1203,7 @@ function App() {
                       onClick={handleNext}
                       className="group flex items-center gap-2 rounded-xl bg-[#93c46d] hover:bg-[#82b35c] px-7 py-3 text-[14px] font-bold text-[#1d497f] shadow-md transition hover:-translate-y-0.5 cursor-pointer"
                     >
-                      <span>Finalizar adhesión bonificada</span>
+                      <span>Finalizar adhesion</span>
                       <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
                     </button>
                   </div>
@@ -1455,27 +1455,29 @@ function App() {
                   <span className="truncate">TABLA DE RESCATE Y ENDOSO</span>
                 </a>
 
-                {/* 4. Botón Modal SORTEO */}
-                <button
-                  type="button"
-                  onClick={() => setSorteoModalOpen(true)}
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
+                {/* 4. Botón SORTEO */}
+                <a
+                  href={`${import.meta.env.BASE_URL}sorteo.pdf`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Información oficial sobre sorteos mensuales de Quiniela LOTBA S.E."
                 >
-                  <HelpCircle size={15} className="text-[#93c46d] shrink-0" />
+                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">SORTEO</span>
-                </button>
+                </a>
 
-                {/* 5. Botón Modal PARTICIPACIÓN Y RENDIMIENTOS */}
-                <button
-                  type="button"
-                  onClick={() => setRendimientosModalOpen(true)}
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
+                {/* 5. Botón PARTICIPACIÓN Y RENDIMIENTOS */}
+                <a
+                  href={`${import.meta.env.BASE_URL}participaciondelosresultados.pdf`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Participación de los Titulares en los resultados de las reservas matemáticas"
                 >
-                  <HelpCircle size={15} className="text-[#93c46d] shrink-0" />
+                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">PARTICIPACIÓN Y RENDIMIENTOS</span>
-                </button>
+                </a>
               </div>
             </div>
 
@@ -1683,7 +1685,7 @@ function App() {
                 <div className="flex items-center gap-2">
                   <FileText size={18} className="text-[#93c46d]" />
                   <h2 className="text-[13px] sm:text-[14px] font-extrabold uppercase tracking-wider text-slate-100">
-                    Bases y Condiciones Contractuales
+                    Bases y Condiciones - Débito Automático
                   </h2>
                 </div>
                 <button
@@ -1707,53 +1709,46 @@ function App() {
                 }}
                 className="overflow-y-auto p-5 sm:p-7 text-left text-[12.5px] leading-relaxed text-slate-700 space-y-4 flex-1"
               >
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-[12px] font-semibold">
-                  ⚠️ Para habilitar la aceptación de las Bases y Condiciones, debés deslizar la barra de desplazamiento hasta el final del documento.
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-[12px] font-semibold mb-4">
+                  ⚠️ Para habilitar la aceptación de los Términos y Condiciones, debés deslizar la barra de desplazamiento hasta el final del documento.
                 </div>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  1. Objeto del Contrato y Marco Regulatorio
+                <h3 className="font-bold text-[#1d497f] text-[15px] sm:text-[16px] uppercase border-b pb-2 mb-4">
+                  Términos y Condiciones - Autorización de débito automático
                 </h3>
-                <p>
-                  El presente contrato tiene por objeto la constitución de un fondo de capitalización y ahorro regulado por la Inspección General de Justicia de la Nación (I.G.J.) bajo Resolución Nº 000289/11 y Decreto Nº 142.277/43, suscripto con FONDUS S.A. DE CAPITALIZACIÓN Y AHORRO, CUIT 30-70474213-0.
+
+                <p className="mb-4">
+                  Fondus S.A. de Capitalización y Ahorro<br />
+                  Presente<br />
+                  De mi mayor consideración:
                 </p>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  2. Emisión del Título y Sorteos Mensuales
-                </h3>
-                <p>
-                  A cada suscriptor se le asigna un número identificatorio de tres (3) dígitos que le otorga derecho a participar del sorteo mensual oficial realizado por LOTBA S.E. (Quiniela de la Ciudad de Buenos Aires) el último sábado de cada mes en su última jugada. El suscriptor que resulte adjudicado queda eximido de abonar cuotas futuras (Adjudicado no paga más) y percibe el capital total suscripto.
+                <p className="mb-4">
+                  Por la presente les solicito que los importes correspondientes al servicio de pagos mensuales del plan de capitalización contratado a vuestra empresa sean facturados y cobrados a través de mi tarjeta de crédito/débito.
                 </p>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  3. Disponibilidad y Rescate de Fondos
-                </h3>
-                <p>
-                  El suscriptor adquiere el derecho formal de rescate a partir de haber abonado como mínimo dieciocho (18) cuotas comerciales consecutivas en los planes de 300 meses o quince (15) cuotas en planes de 180 meses, según los coeficientes aprobados en la Tabla Oficial de Rescates.
+                <p className="mb-4">
+                  En tal sentido, autorizo expresamente a Fondus S.A. de Capitalización y Ahorro a realizar el cobro de las cuotas mencionadas a través de mi tarjeta de crédito/débito.
                 </p>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  4. Participación en Rendimientos Financieros
-                </h3>
-                <p>
-                  De conformidad con el Artículo 9º, los Titulares participan en el 50% del excedente de rentabilidad neta de las inversiones que respaldan las Reservas Matemáticas de Fondus S.A., acumulándose en forma separada a favor del suscriptor.
+                <p className="mb-4">
+                  La presente continuará vigente hasta tanto medie comunicación fehaciente de mi parte para revocarla. Reconozco expresamente que tanto la presentación del servicio por parte de vuestra entidad como los importes que autorizo a debitar de mi resumen tiene como causa exclusiva la relación contractual existente entre Fondus S.A. de Capitalización y Ahorro y el suscriptor. Es de mi conocimiento que el abono mensual se facturará por mes calendario adelantado, como asimismo debe ser cancelado de la misma manera.
                 </p>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  5. Adhesión Digital y Bonificación de Ingreso
-                </h3>
-                <p>
-                  La adhesión formalizada en este canal digital cuenta con el 100% de bonificación sobre el derecho de suscripción inicial ($0), sin cobradores a domicilio y con canales de débito y pago electrónico directo.
+                <p className="mb-4">
+                  A su vez, declaro que he completado esta autorización de manera electrónica a través de la plataforma de vuestra empresa, proveyendo libremente de datos necesarios a los fines del débito. Expreso que a los efectos de la autorización otorgada, proveo de datos imprescindibles para la efectivización del débito aquí autorizado, razón por la cual asumo la exclusiva responsabilidad por la información correcta y precisa de tales datos para la realización de los débitos autorizados, motivo por el cual libero a vuestra empresa por incorrecta, imprecisa y/o errónea información que he brindado.
                 </p>
 
-                <h3 className="font-bold text-[#1d497f] text-[14px] uppercase border-b pb-1">
-                  6. Declaración de Conformidad
-                </h3>
-                <p>
-                  El suscriptor declara haber leído en su totalidad las condiciones generales, aceptando los términos contractuales del título de capitalización y ahorro.
+                <p className="mb-4">
+                  Por otro lado, informo que no se me ha solicitado clave o información confidencial que no sea necesaria para la ejecución de las tareas relativas a los débitos que les permito efectuar, como por ejemplo claves de banca electrónica, homebanking, token, o similares con las mismas características.
                 </p>
+
+                <p className="mb-4">
+                  Por último, declaro que comprendo el contenido íntegro de la presente por haberme sido explicado de manera completa, suficiente y eficaz por vuestra entidad para el otorgamiento de esta autorización.
+                </p>
+
                 <div className="pt-2 text-center text-xs font-bold text-slate-500">
-                  --- Fin de las Bases y Condiciones ---
+                  --- Fin de la Autorización de Débito Automático ---
                 </div>
               </div>
 
