@@ -80,51 +80,40 @@ function formatMoney(value: number) {
   return `$ ${new Intl.NumberFormat('es-AR').format(value)}`;
 }
 
-// 7. Lógica Dinámica de Fechas para Contador de Adjudicación (Fondus)
-// Reglas del Negocio:
-// - El sorteo se realiza indefectiblemente el último sábado de cada mes a las 21:00 hs.
-// - El límite de tiempo para ingresar y participar en el sorteo del mes en curso es el último miércoles de ese mismo mes a las 23:59 hs.
+// Lógica Oficial de Fechas para Contador de Adjudicación (Fondus)
+const getNextDrawDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
 
-function getLastSaturdayOfMonth(year: number, month: number): Date {
-  // Día 0 del mes siguiente es el último día del mes actual
-  const lastDay = new Date(year, month + 1, 0);
-  const dayOfWeek = lastDay.getDay(); // 0 Domingo, 6 Sábado
-  const daysToSubtract = (dayOfWeek + 1) % 7;
-  const lastSatDate = lastDay.getDate() - daysToSubtract;
-  return new Date(year, month, lastSatDate, 21, 0, 0, 0);
-}
+  // Función auxiliar para obtener el último día de la semana específico del mes (3=Miércoles, 6=Sábado)
+  const getLastDay = (y: number, m: number, dayOfWeek: number) => {
+    const d = new Date(y, m + 1, 0); // Último día del mes
+    while (d.getDay() !== dayOfWeek) {
+      d.setDate(d.getDate() - 1);
+    }
+    return d;
+  };
 
-function getLastWednesdayOfMonth(year: number, month: number): Date {
-  const lastDay = new Date(year, month + 1, 0);
-  const dayOfWeek = lastDay.getDay(); // 0 Domingo, 3 Miércoles, 6 Sábado
-  const daysToSubtract = (dayOfWeek + 4) % 7;
-  const lastWedDate = lastDay.getDate() - daysToSubtract;
-  return new Date(year, month, lastWedDate, 23, 59, 59, 999);
-}
+  // Límite de adhesión: Último miércoles a las 23:59:59
+  const lastWednesday = getLastDay(year, month, 3);
+  lastWednesday.setHours(23, 59, 59, 999);
 
-function getFechaObjetivoSorteo(now: Date = new Date()): Date {
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  // Sorteo actual: Último sábado a las 21:00:00
+  let nextDraw = getLastDay(year, month, 6);
+  nextDraw.setHours(21, 0, 0, 0);
 
-  // Obtén la fecha del último miércoles y la del último sábado del mes actual
-  const ultimoMiercoles = getLastWednesdayOfMonth(currentYear, currentMonth);
-  const ultimoSabadoMesActual = getLastSaturdayOfMonth(currentYear, currentMonth);
-
-  // Si la fecha y hora actual (new Date()) es mayor al último miércoles del mes,
-  // la variable de la fecha objetivo debe pasar a ser automáticamente el último sábado del mes siguiente.
-  // También si ya superó el horario del sorteo del sábado del mes actual.
-  if (now.getTime() > ultimoMiercoles.getTime() || now.getTime() > ultimoSabadoMesActual.getTime()) {
-    const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-    const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-    return getLastSaturdayOfMonth(nextYear, nextMonth);
+  // Regla de Negocio: Si la fecha actual supera el último miércoles, el sorteo pasa al mes siguiente
+  if (now.getTime() > lastWednesday.getTime()) {
+    nextDraw = getLastDay(year, month + 1, 6);
+    nextDraw.setHours(21, 0, 0, 0);
   }
 
-  // Si la fecha actual es anterior o igual al último miércoles, la fecha objetivo se mantiene en el último sábado del mes actual.
-  return ultimoSabadoMesActual;
-}
+  return nextDraw;
+};
 
-function getProximoSorteoInfo(now: Date = new Date()) {
-  const sorteoDate = getFechaObjetivoSorteo(now);
+function getProximoSorteoInfo() {
+  const sorteoDate = getNextDrawDate();
 
   const prevMonthDate = new Date(sorteoDate.getFullYear(), sorteoDate.getMonth() - 1, 1);
   const meses = [
@@ -342,14 +331,23 @@ function SectionHeading({
 }
 
 function Countdown({ targetTime }: { targetTime?: number }) {
-  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  // Estado inicial del contador alimentado de getNextDrawDate()
+  const [time, setTime] = useState(() => {
+    const target = targetTime ? new Date(targetTime) : getNextDrawDate();
+    const distance = Math.max(0, target.getTime() - Date.now());
+    return {
+      days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((distance / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((distance / (1000 * 60)) % 60),
+      seconds: Math.floor((distance / 1000) % 60),
+    };
+  });
 
   useEffect(() => {
     const tick = () => {
-      const now = new Date();
-      // Si no se provee targetTime explícito, calcula la fecha objetivo dinámicamente
-      const target = targetTime ? new Date(targetTime) : getFechaObjetivoSorteo(now);
-      const distance = Math.max(0, target.getTime() - now.getTime());
+      // El setInterval compara la fecha actual contra la variable actualizada de getNextDrawDate()
+      const target = getNextDrawDate();
+      const distance = Math.max(0, target.getTime() - Date.now());
 
       setTime({
         days: Math.floor(distance / (1000 * 60 * 60 * 24)),
