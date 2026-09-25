@@ -654,7 +654,6 @@ function App() {
         !form.nombre.trim() ||
         !form.apellido.trim() ||
         !form.dni.trim() ||
-        !form.fechaNacimiento.trim() ||
         !form.whatsapp.trim() ||
         !form.email.trim()
       ) {
@@ -1118,8 +1117,9 @@ function App() {
                           </span>
                         </label>
 
-                        <label
-                          className={`flex items-start gap-3 rounded-2xl border-2 p-4 transition select-none ${
+                        <div
+                          onClick={() => setTermsModalOpen(true)}
+                          className={`flex items-start gap-3 rounded-2xl border-2 p-4 transition select-none cursor-pointer ${
                             checkBasesCondiciones
                               ? 'border-[#93c46d] bg-[#93c46d]/10'
                               : 'border-slate-200 bg-white hover:border-[#1d497f]/40'
@@ -1128,25 +1128,19 @@ function App() {
                           <input
                             type="checkbox"
                             checked={checkBasesCondiciones}
-                            onChange={(e) => setCheckBasesCondiciones(e.target.checked)}
-                            className="mt-0.5 h-5 w-5 rounded border-slate-300 text-[#93c46d] focus:ring-[#93c46d] shrink-0 cursor-pointer accent-[#93c46d]"
-                            required
+                            onChange={(e) => e.preventDefault()}
+                            readOnly
+                            tabIndex={-1}
+                            className="mt-0.5 h-5 w-5 rounded border-slate-300 text-[#93c46d] focus:ring-[#93c46d] shrink-0 pointer-events-none accent-[#93c46d]"
                           />
                           <span className="text-[13px] font-semibold text-[#1d497f] leading-snug">
                             Acepto{' '}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setTermsModalOpen(true);
-                              }}
-                              className="font-bold underline text-[#1d497f] hover:text-[#93c46d] transition cursor-pointer"
-                            >
+                            <span className="font-bold underline text-[#1d497f] hover:text-[#93c46d] transition">
                               bases y condiciones
-                            </button>{' '}
+                            </span>{' '}
                             del título de capitalización y ahorro emitido por Fondus.
                           </span>
-                        </label>
+                        </div>
                       </div>
 
                       {checkoutError && (
@@ -1526,18 +1520,13 @@ function App() {
               Si completás el proceso de adhesión de manera automática, tenés la suscripción bonificada.
             </h2>
 
-            <p className="mt-2 text-[13px] leading-relaxed text-slate-600">
-              Avanzando de forma 100% digital accedés a tu plan{' '}
-              <strong className="text-[#1d497f]">{selectedPlan.title}</strong> con cuota de ingreso $0.
-            </p>
-
             <div className="mt-6">
               <button
                 type="button"
                 onClick={handleProceedFromRetention}
                 className="flex items-center justify-center gap-2 w-full rounded-xl bg-[#93c46d] hover:bg-[#82b35c] py-3.5 px-5 text-[14px] font-bold text-[#1d497f] shadow-md transition hover:-translate-y-0.5 cursor-pointer"
               >
-                <Zap size={16} /> Continuar con Suscripción Bonificada
+                <Zap size={16} /> Continuar con suscripción bonificada
               </button>
             </div>
           </div>
@@ -1750,7 +1739,7 @@ function App() {
                       : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
                   }`}
                 >
-                  Aceptar Bases y Condiciones
+                  Aceptar
                 </button>
               </div>
             </motion.div>
