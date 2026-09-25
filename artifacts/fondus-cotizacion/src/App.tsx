@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 
 import SocialProof from './components/SocialProof';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 
 type Plan = {
   id: string;
@@ -1834,20 +1835,39 @@ function App() {
                 </button>
               </div>
 
-              {/* Contenedor con scroll y propiedades táctiles para permitir Zoom (Pinch-to-zoom) */}
-              <div className="w-full h-full overflow-auto touch-pan-x touch-pan-y bg-slate-100/60">
+              {/* Contenedor principal del modal con desbloqueo de gestos táctiles y pinch-zoom */}
+              <div className="w-full h-full overflow-auto touch-pan-x touch-pan-y pinch-zoom bg-slate-100/60 flex flex-col">
                 {activeDocument.endsWith('.jpg') || activeDocument.endsWith('.jpeg') || activeDocument.endsWith('.png') ? (
-                  <img
-                    src={getDocumentSrc(activeDocument)}
-                    alt="Documento Legal Fondus"
-                    className="w-full h-auto object-contain cursor-zoom-in max-w-none"
-                  />
+                  <div className="w-full h-full flex-grow flex items-center justify-center overflow-hidden">
+                    <TransformWrapper
+                      initialScale={1}
+                      minScale={0.8}
+                      maxScale={6}
+                      centerOnInit
+                      wheel={{ step: 0.1 }}
+                      pinch={{ step: 5 }}
+                      doubleClick={{ mode: 'toggle' }}
+                    >
+                      <TransformComponent
+                        wrapperClass="!w-full !h-full flex items-center justify-center"
+                        contentClass="!w-full flex items-center justify-center"
+                      >
+                        <img
+                          src={getDocumentSrc(activeDocument)}
+                          alt="Documento Legal Fondus"
+                          className="w-full h-auto object-contain cursor-zoom-in max-w-none"
+                        />
+                      </TransformComponent>
+                    </TransformWrapper>
+                  </div>
                 ) : (
-                  <iframe
-                    src={getDocumentSrc(activeDocument)}
-                    className="w-full min-h-[85vh] border-none"
-                    title="Documento Legal Fondus"
-                  />
+                  <div className="w-full h-full overflow-auto touch-auto [-webkit-overflow-scrolling:touch]">
+                    <iframe
+                      src={getDocumentSrc(activeDocument)}
+                      className="w-full min-h-[85vh] border-none"
+                      title="Documento Legal Fondus"
+                    />
+                  </div>
                 )}
               </div>
             </motion.div>
