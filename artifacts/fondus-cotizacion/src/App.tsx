@@ -667,23 +667,33 @@ function App() {
     setArrepentimientoSent(true);
   };
 
-  // 6. Preguntas Frecuentes estrictas
+  // 6. Preguntas Frecuentes
   const faqs = [
     {
-      q: '¿Qué es un sistema de capitalización y quién lo regula?',
-      a: 'Un sistema de capitalización y ahorro es un contrato financiero oficial aprobado y supervisado por la Inspección General de Justicia de la Nación (I.G.J. Resolución Nº 000289/11 y Decreto Nº 142.277/43). Permite a los suscriptores integrar un capital objetivo a través de cuotas periódicas, accediendo a sorteos mensuales de adjudicación anticipada desde la cuota 1.',
+      q: '¿Qué es un sistema de capitalización y ahorro y quién lo regula?',
+      a: 'Es un sistema que te permite ahorrar en cuotas mensuales a través de un título que, a su vencimiento, te garantiza la devolución de lo que aportaste más un interés capitalizable y una participación en las utilidades o rendimientos de las inversiones. Además, todos los meses participás de un sorteo garantizado por el monto de tu título. Fondus está regulado por la IGJ (Inspección General de Justicia), el organismo que autoriza y controla a las empresas de capitalización y ahorro en Argentina.',
+    },
+    {
+      q: '¿Puedo retirar mi dinero antes de terminar el plan?',
+      a: 'Sí. El plan tiene una duración de 300 cuotas y, a partir de la cuota 18, podés pedir el rescate y cobrar el monto que figura en la tabla de rescates incluida en tu título.',
     },
     {
       q: '¿Cómo funciona el sorteo de adjudicación?',
-      a: 'El sorteo se realiza mensualmente mediante la última jugada del último sábado de cada mes de la Quiniela de la Lotería de la Ciudad de Buenos Aires (LOTBA S.E.). Si las tres últimas cifras del número de tu Título coinciden con el primer premio, resultás adjudicado y ¡NO PAGÁS MÁS! Quedás eximido de todas las cuotas futuras y recibís la totalidad de tu capital.',
+      a: 'El sorteo se realiza el último sábado de cada mes a través de LOTBA (Lotería de la Ciudad de Buenos Aires). Participás con tu cuota del mes paga y tu número de suscripción de 3 cifras. Si salís adjudicado, no pagás más y te llevás tu plan.',
     },
     {
       q: '¿Qué pasa después de suscribirme?',
-      a: 'Registrada tu adhesión digital 100% bonificada, se emite tu Título Oficial de Capitalización con tu número de participación de 3 cifras asignado y tus comprobantes. Recibirás toda la documentación oficial por correo electrónico y WhatsApp, quedando inmediatamente habilitado para el próximo sorteo mensual.',
+      a: 'Dentro de las 24 hs posteriores a tu suscripción, te vamos a estar contactando para darte la bienvenida, contarte todo sobre tu plan y darte acceso a tu panel de autogestión, donde vas a poder ver el detalle completo de tu plan.',
     },
     {
-      q: '¿Qué beneficios adicionales obtengo ingresando a Fondus?',
-      a: 'Todos los planes de Fondus incluyen sin costo adicional cobertura médica integral con Telemedicina 24/7, Seguro de Vida durante toda la vigencia, posibilidad de rescate y disponibilidad de fondos a partir de la cuota 18, y participación del 50% en los rendimientos financieros de las reservas matemáticas.',
+      q: '¿Tengo beneficios adicionales?',
+      a: 'Sí, además del sorteo de adjudicación tenés:',
+      items: [
+        'Bonificación de cuota: si pagás antes del día 10, participás por la bonificación del 100% de la cuota del mes siguiente.',
+        'Seguro de vida y telemedicina 24 hs de Caruso Seguros.',
+        'Sorteo por derecho de ingreso: si pagás el 100% de la suscripción en un único pago, participás por una moto 0 km.',
+        'Sorteo con Naranja: si te adherís a tu plan con tarjeta de crédito Naranja, a fin de año participás por una moto 0 km.',
+      ],
     },
   ];
 
@@ -1209,7 +1219,7 @@ function App() {
         </div>
       </main>
 
-      {/* 6. Preguntas Frecuentes (Acordeón de 4 preguntas estrictas) */}
+      {/* 6. Preguntas Frecuentes (Acordeón de 5 preguntas) */}
       <section id="preguntas-frecuentes" className="border-t border-slate-200 bg-white">
         <div className="mx-auto max-w-[1000px] px-5 py-16 sm:px-8">
           <div className="mb-10 text-center">
@@ -1227,26 +1237,44 @@ function App() {
               return (
                 <div
                   key={faq.q}
-                  className="rounded-2xl border border-slate-200 bg-slate-50/70 overflow-hidden transition"
+                  className="rounded-2xl border border-slate-200 bg-slate-50/70 overflow-hidden transition-all duration-300"
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between p-5 text-left text-[14px] font-bold text-[#1d497f] transition hover:bg-slate-100/70 cursor-pointer"
+                    className="flex w-full items-center justify-between p-5 text-left text-[14px] sm:text-[15px] font-bold text-[#1d497f] transition hover:bg-slate-100/70 cursor-pointer"
                   >
-                    <span>{faq.q}</span>
+                    <span className="text-[#1d497f]">{faq.q}</span>
                     <ChevronDown
-                      size={18}
-                      className={`text-[#1d497f] transition-transform duration-200 shrink-0 ml-3 ${
+                      size={20}
+                      className={`text-[#93c46d] transition-transform duration-300 shrink-0 ml-3 ${
                         isOpen ? 'rotate-180' : ''
                       }`}
                     />
                   </button>
-                  {isOpen && (
-                    <div className="px-5 pb-5 text-[13px] leading-relaxed text-slate-600 border-t border-slate-200/60 pt-3">
-                      {faq.a}
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="content"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 pb-5 text-[13.5px] leading-relaxed text-gray-700 border-t border-slate-200/60 pt-3">
+                          <p>{faq.a}</p>
+                          {faq.items && faq.items.length > 0 && (
+                            <ul className="list-disc pl-5 space-y-2 mt-3 text-gray-700">
+                              {faq.items.map((item, itemIdx) => (
+                                <li key={itemIdx}>{item}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
