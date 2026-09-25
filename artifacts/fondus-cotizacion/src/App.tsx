@@ -617,10 +617,10 @@ function App() {
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsScrolled, setTermsScrolled] = useState(false);
 
-  // Visor PDF en Modal Interno
-  const [activePdf, setActivePdf] = useState<string | null>(null);
+  // Visor Multimedia en Modal Interno (PDF e Imágenes)
+  const [activeDocument, setActiveDocument] = useState<string | null>(null);
 
-  const getPdfTitle = (url: string | null) => {
+  const getDocumentTitle = (url: string | null) => {
     if (!url) return 'Documento Legal';
     if (url.includes('condiciones')) return 'Condiciones Generales';
     if (url.includes('titulo')) return 'Título de Capitalización';
@@ -630,10 +630,16 @@ function App() {
     return 'Documento Legal';
   };
 
-  const getPdfSrc = (url: string | null) => {
+  const getDocumentSrc = (url: string | null) => {
     if (!url) return '';
     const clean = url.startsWith('/') ? url.slice(1) : url;
     return `${import.meta.env.BASE_URL}${clean}`;
+  };
+
+  // Auto-avance inmediato al seleccionar un plan
+  const handleSelectPlan = (planItem: Plan) => {
+    setSelectedPlan(planItem);
+    setStep(1); // Inmediatamente cambia al Paso 2
   };
 
   // Acordeón FAQ
@@ -645,7 +651,7 @@ function App() {
   // Bloqueo de scroll en el body cuando un modal interactivo está abierto
   useEffect(() => {
     const isAnyModalActive =
-      Boolean(activePdf) ||
+      Boolean(activeDocument) ||
       sorteoModalOpen ||
       rendimientosModalOpen ||
       retentionModalOpen ||
@@ -662,7 +668,7 @@ function App() {
       document.body.classList.remove('overflow-hidden');
     };
   }, [
-    activePdf,
+    activeDocument,
     sorteoModalOpen,
     rendimientosModalOpen,
     retentionModalOpen,
@@ -941,7 +947,7 @@ function App() {
                             key={planItem.id}
                             plan={planItem}
                             selected={planItem.id === selectedPlan.id}
-                            onSelect={() => setSelectedPlan(planItem)}
+                            onSelect={() => handleSelectPlan(planItem)}
                           />
                         ))}
                       </div>
@@ -1031,26 +1037,27 @@ function App() {
                   </div>
                 )}
 
-                {/* 2. Botón "Atrás": repara la flecha de retroceso */}
-                <div className="mt-8 flex items-center justify-between gap-3 pt-4 border-t border-slate-200">
-                  <button
-                    type="button"
-                    onClick={handlePrev}
-                    disabled={step === 0}
-                    className="flex items-center gap-2 rounded-xl border-2 border-[#1d497f]/30 px-5 py-3 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/10 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <ArrowLeft size={16} /> Volver
-                  </button>
+                {/* 2. Botones de Navegación del Stepper (SÓLO visible en Paso 2: Datos Personales) */}
+                {step === 1 && (
+                  <div className="mt-8 flex items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      className="flex items-center gap-2 rounded-xl border-2 border-[#1d497f]/30 px-5 py-3 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/10 cursor-pointer"
+                    >
+                      <ArrowLeft size={16} /> Volver
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="group flex items-center gap-2 rounded-xl bg-[#93c46d] hover:bg-[#82b35c] px-7 py-3 text-[14px] font-bold text-[#1d497f] shadow-md transition hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <span>Continuar</span>
-                    <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="group flex items-center gap-2 rounded-xl bg-[#93c46d] hover:bg-[#82b35c] px-7 py-3 text-[14px] font-bold text-[#1d497f] shadow-md transition hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <span>Continuar</span>
+                      <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+                    </button>
+                  </div>
+                )}
 
                 <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400">
                   <Clock3 size={13} /> Proceso 100% digital · Menos de 2 minutos
@@ -1383,7 +1390,7 @@ function App() {
           <div className="mt-8 text-center">
             <button
               type="button"
-              onClick={() => setActivePdf('/condiciones.pdf')}
+              onClick={() => setActiveDocument('/condiciones.pdf')}
               className="inline-flex items-center gap-2 rounded-xl bg-[#1d497f]/10 border border-[#1d497f]/20 px-6 py-3 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f] hover:text-white cursor-pointer"
             >
               <FileText size={16} />
@@ -1442,7 +1449,7 @@ function App() {
                 {/* 1. Botón CONDICIONES GENERALES */}
                 <button
                   type="button"
-                  onClick={() => setActivePdf('/condiciones.pdf')}
+                  onClick={() => setActiveDocument('/condiciones.pdf')}
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento que detalla el objeto del contrato, cálculo de cuotas y normativas de la IGJ"
                 >
@@ -1453,7 +1460,7 @@ function App() {
                 {/* 2. Botón TÍTULO DE CAPITALIZACIÓN */}
                 <button
                   type="button"
-                  onClick={() => setActivePdf('/titulo.pdf')}
+                  onClick={() => setActiveDocument('/titulo.pdf')}
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento que muestra el modelo del título, vigencia y capital nominal"
                 >
@@ -1464,7 +1471,7 @@ function App() {
                 {/* 3. Botón TABLA DE RESCATE Y ENDOSO */}
                 <button
                   type="button"
-                  onClick={() => setActivePdf('/rescate.pdf')}
+                  onClick={() => setActiveDocument('/rescate.pdf')}
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento con la tabla de valores de rescate para planes de 300 meses"
                 >
@@ -1475,7 +1482,7 @@ function App() {
                 {/* 4. Botón SORTEO */}
                 <button
                   type="button"
-                  onClick={() => setActivePdf('/sorteo.pdf')}
+                  onClick={() => setActiveDocument('/sorteo.jpg')}
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Información oficial sobre sorteos mensuales de Quiniela LOTBA S.E."
                 >
@@ -1486,7 +1493,7 @@ function App() {
                 {/* 5. Botón PARTICIPACIÓN Y RENDIMIENTOS */}
                 <button
                   type="button"
-                  onClick={() => setActivePdf('/participaciondelosresultados.pdf')}
+                  onClick={() => setActiveDocument('/participaciondelosresultados.jpg')}
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Participación de los Titulares en los resultados de las reservas matemáticas"
                 >
@@ -1654,7 +1661,7 @@ function App() {
             <div className="mt-6 space-y-3">
               <button
                 type="button"
-                onClick={() => setActivePdf('/titulo.pdf')}
+                onClick={() => setActiveDocument('/titulo.pdf')}
                 className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-[#1d497f] bg-white py-2.5 px-4 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/5 cursor-pointer"
               >
                 <FileText size={16} /> Ver Modelo de Título de Capitalización (PDF)
@@ -1793,13 +1800,13 @@ function App() {
       </AnimatePresence>
 
       {/* ========================================================================= */}
-      {/* MODAL: VISOR PDF EN MODAL INTERNO (Pop-up interactivo)                    */}
+      {/* MODAL: VISOR MULTIMEDIA EN MODAL INTERNO (PDF e Imágenes con Zoom Táctil) */}
       {/* ========================================================================= */}
       <AnimatePresence>
-        {activePdf && (
+        {activeDocument && (
           <div
             className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 backdrop-blur-xs"
-            onClick={() => setActivePdf(null)}
+            onClick={() => setActiveDocument(null)}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -1814,12 +1821,12 @@ function App() {
                 <div className="flex items-center gap-2.5">
                   <FileText size={18} className="text-[#93c46d]" />
                   <h2 className="text-[13px] sm:text-[14px] font-extrabold uppercase tracking-wider text-slate-100">
-                    {getPdfTitle(activePdf)}
+                    {getDocumentTitle(activeDocument)}
                   </h2>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setActivePdf(null)}
+                  onClick={() => setActiveDocument(null)}
                   className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-white/15 hover:text-white transition cursor-pointer"
                   aria-label="Cerrar modal"
                 >
@@ -1827,12 +1834,22 @@ function App() {
                 </button>
               </div>
 
-              {/* Contenido (El Visor) */}
-              <iframe
-                src={getPdfSrc(activePdf)}
-                className="w-full flex-grow border-none"
-                title="Documento Legal"
-              />
+              {/* Contenedor con scroll y propiedades táctiles para permitir Zoom (Pinch-to-zoom) */}
+              <div className="w-full h-full overflow-auto touch-pan-x touch-pan-y bg-slate-100/60">
+                {activeDocument.endsWith('.jpg') || activeDocument.endsWith('.jpeg') || activeDocument.endsWith('.png') ? (
+                  <img
+                    src={getDocumentSrc(activeDocument)}
+                    alt="Documento Legal Fondus"
+                    className="w-full h-auto object-contain cursor-zoom-in max-w-none"
+                  />
+                ) : (
+                  <iframe
+                    src={getDocumentSrc(activeDocument)}
+                    className="w-full min-h-[85vh] border-none"
+                    title="Documento Legal Fondus"
+                  />
+                )}
+              </div>
             </motion.div>
           </div>
         )}
