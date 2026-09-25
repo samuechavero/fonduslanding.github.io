@@ -746,7 +746,7 @@ function App() {
         }\n\n` +
         `Fecha y hora: ${new Date().toLocaleString('es-AR')}`
     );
-    window.location.href = `mailto:atencion@fondus.com.ar?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:agenciadigital@fondus.com.ar?subject=${subject}&body=${body}`;
     setArrepentimientoSent(true);
   };
 
@@ -1427,7 +1427,7 @@ function App() {
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Documento que detalla el objeto del contrato, cálculo de cuotas y normativas de la IGJ"
                 >
-                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
+                  <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">CONDICIONES GENERALES</span>
                 </a>
 
@@ -1439,7 +1439,7 @@ function App() {
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Documento que muestra el modelo del título, vigencia y capital nominal"
                 >
-                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
+                  <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">TÍTULO DE CAPITALIZACIÓN</span>
                 </a>
 
@@ -1451,7 +1451,7 @@ function App() {
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Documento con la tabla de valores de rescate para planes de 300 meses"
                 >
-                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
+                  <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">TABLA DE RESCATE Y ENDOSO</span>
                 </a>
 
@@ -1463,7 +1463,7 @@ function App() {
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Información oficial sobre sorteos mensuales de Quiniela LOTBA S.E."
                 >
-                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
+                  <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">SORTEO</span>
                 </a>
 
@@ -1475,7 +1475,7 @@ function App() {
                   className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
                   title="Participación de los Titulares en los resultados de las reservas matemáticas"
                 >
-                  <FileDown size={15} className="text-[#93c46d] shrink-0" />
+                  <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">PARTICIPACIÓN Y RENDIMIENTOS</span>
                 </a>
               </div>
@@ -1808,13 +1808,13 @@ function App() {
                       Botón de Arrepentimiento
                     </h2>
                     <p className="text-[12px] text-slate-500">
-                      Envío directo a <strong className="text-[#1d497f]">atencion@fondus.com.ar</strong>
+                      Envío directo a <strong className="text-[#1d497f]">agenciadigital@fondus.com.ar</strong>
                     </p>
                   </div>
                 </div>
 
                 <p className="text-[12px] leading-relaxed text-slate-600">
-                  Conforme a la Ley de Defensa del Consumidor, completá el formulario para enviar tu solicitud formal de revocación directamente al correo oficial de Fondus:
+                  Conforme a la Ley de Defensa del Consumidor, completá el formulario para enviar tu solicitud formal de baja y arrepentimiento directamente a <strong className="text-[#1d497f]">agenciadigital@fondus.com.ar</strong>:
                 </p>
 
                 <div className="space-y-3">
@@ -1904,10 +1904,10 @@ function App() {
                     type="submit"
                     className="flex items-center justify-center gap-2 w-full rounded-xl bg-[#93c46d] hover:bg-[#82b35c] py-3 px-4 text-[13px] font-bold text-[#1d497f] shadow-md transition cursor-pointer"
                   >
-                    <Send size={15} /> Enviar Correo a Fondus
+                    <Send size={15} /> Enviar Solicitud a Fondus
                   </button>
                   <p className="text-[10px] text-center text-slate-400">
-                    Se abrirá tu cliente de correo con los datos precompletados a atencion@fondus.com.ar
+                    Se abrirá tu cliente de correo con los datos precompletados dirigidos a agenciadigital@fondus.com.ar
                   </p>
                 </div>
               </form>
@@ -1920,7 +1920,7 @@ function App() {
                   ¡Solicitud Enviada a Fondus!
                 </h3>
                 <p className="text-[13px] leading-relaxed text-slate-600">
-                  Tu solicitud de arrepentimiento fue enviada a <strong>atencion@fondus.com.ar</strong>. Nuestro equipo responderá formalmente según los plazos legales.
+                  Tu solicitud de baja fue dirigida a <strong>agenciadigital@fondus.com.ar</strong>. Nuestro equipo responderá formalmente según los plazos legales.
                 </p>
                 <button
                   type="button"
