@@ -86,30 +86,29 @@ const getNextDrawDate = () => {
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  // Función auxiliar para obtener el último día de la semana específico del mes (3=Miércoles, 6=Sábado)
-  const getLastDay = (y: number, m: number, dayOfWeek: number) => {
-    const d = new Date(y, m + 1, 0); // Último día del mes
-    while (d.getDay() !== dayOfWeek) {
-      d.setDate(d.getDate() - 1);
+  // 1. Encontrar el último sábado del mes actual
+  const lastSaturday = new Date(year, month + 1, 0);
+  while (lastSaturday.getDay() !== 6) {
+    lastSaturday.setDate(lastSaturday.getDate() - 1);
+  }
+  lastSaturday.setHours(21, 0, 0, 0);
+
+  // 2. El límite de adhesión es exactamente 3 días antes (Miércoles) a las 23:59:59
+  const cutOffWednesday = new Date(lastSaturday);
+  cutOffWednesday.setDate(lastSaturday.getDate() - 3);
+  cutOffWednesday.setHours(23, 59, 59, 999);
+
+  // 3. Si la fecha actual supera el límite de ese miércoles, pasamos al último sábado del mes siguiente
+  if (now.getTime() > cutOffWednesday.getTime()) {
+    const nextMonthSaturday = new Date(year, month + 2, 0);
+    while (nextMonthSaturday.getDay() !== 6) {
+      nextMonthSaturday.setDate(nextMonthSaturday.getDate() - 1);
     }
-    return d;
-  };
-
-  // Límite de adhesión: Último miércoles a las 23:59:59
-  const lastWednesday = getLastDay(year, month, 3);
-  lastWednesday.setHours(23, 59, 59, 999);
-
-  // Sorteo actual: Último sábado a las 21:00:00
-  let nextDraw = getLastDay(year, month, 6);
-  nextDraw.setHours(21, 0, 0, 0);
-
-  // Regla de Negocio: Si la fecha actual supera el último miércoles, el sorteo pasa al mes siguiente
-  if (now.getTime() > lastWednesday.getTime()) {
-    nextDraw = getLastDay(year, month + 1, 6);
-    nextDraw.setHours(21, 0, 0, 0);
+    nextMonthSaturday.setHours(21, 0, 0, 0);
+    return nextMonthSaturday;
   }
 
-  return nextDraw;
+  return lastSaturday;
 };
 
 function getProximoSorteoInfo() {
