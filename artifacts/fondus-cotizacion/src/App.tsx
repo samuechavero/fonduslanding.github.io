@@ -617,6 +617,25 @@ function App() {
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsScrolled, setTermsScrolled] = useState(false);
 
+  // Visor PDF en Modal Interno
+  const [activePdf, setActivePdf] = useState<string | null>(null);
+
+  const getPdfTitle = (url: string | null) => {
+    if (!url) return 'Documento Legal';
+    if (url.includes('condiciones')) return 'Condiciones Generales';
+    if (url.includes('titulo')) return 'Título de Capitalización';
+    if (url.includes('rescate')) return 'Tabla de Rescate y Endoso';
+    if (url.includes('sorteo')) return 'Sorteo';
+    if (url.includes('participacion')) return 'Participación y Rendimientos';
+    return 'Documento Legal';
+  };
+
+  const getPdfSrc = (url: string | null) => {
+    if (!url) return '';
+    const clean = url.startsWith('/') ? url.slice(1) : url;
+    return `${import.meta.env.BASE_URL}${clean}`;
+  };
+
   // Acordeón FAQ
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -626,6 +645,7 @@ function App() {
   // Bloqueo de scroll en el body cuando un modal interactivo está abierto
   useEffect(() => {
     const isAnyModalActive =
+      Boolean(activePdf) ||
       sorteoModalOpen ||
       rendimientosModalOpen ||
       retentionModalOpen ||
@@ -642,6 +662,7 @@ function App() {
       document.body.classList.remove('overflow-hidden');
     };
   }, [
+    activePdf,
     sorteoModalOpen,
     rendimientosModalOpen,
     retentionModalOpen,
@@ -1360,16 +1381,15 @@ function App() {
 
           {/* 6. Enlace visible: "Ver Condiciones Generales" */}
           <div className="mt-8 text-center">
-            <a
-              href={`${import.meta.env.BASE_URL}condiciones.pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#1d497f]/10 border border-[#1d497f]/20 px-6 py-3 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f] hover:text-white"
+            <button
+              type="button"
+              onClick={() => setActivePdf('/condiciones.pdf')}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#1d497f]/10 border border-[#1d497f]/20 px-6 py-3 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f] hover:text-white cursor-pointer"
             >
               <FileText size={16} />
               <span>Ver Condiciones Generales</span>
               <ArrowRight size={14} />
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -1413,71 +1433,66 @@ function App() {
               </div>
             </div>
 
-            {/* CONDICIONES GENERALES (5 Botones / Enlaces sin atributo download) */}
+            {/* CONDICIONES GENERALES (5 Botones con Visor Modal Interno) */}
             <div>
               <h3 className="mb-5 text-[11px] font-bold uppercase tracking-[.14em] text-[#93c46d]">
                 Condiciones Generales
               </h3>
               <div className="space-y-2">
                 {/* 1. Botón CONDICIONES GENERALES */}
-                <a
-                  href={`${import.meta.env.BASE_URL}condiciones.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
+                <button
+                  type="button"
+                  onClick={() => setActivePdf('/condiciones.pdf')}
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento que detalla el objeto del contrato, cálculo de cuotas y normativas de la IGJ"
                 >
                   <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">CONDICIONES GENERALES</span>
-                </a>
+                </button>
 
                 {/* 2. Botón TÍTULO DE CAPITALIZACIÓN */}
-                <a
-                  href={`${import.meta.env.BASE_URL}titulo.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
+                <button
+                  type="button"
+                  onClick={() => setActivePdf('/titulo.pdf')}
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento que muestra el modelo del título, vigencia y capital nominal"
                 >
                   <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">TÍTULO DE CAPITALIZACIÓN</span>
-                </a>
+                </button>
 
                 {/* 3. Botón TABLA DE RESCATE Y ENDOSO */}
-                <a
-                  href={`${import.meta.env.BASE_URL}rescate.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
+                <button
+                  type="button"
+                  onClick={() => setActivePdf('/rescate.pdf')}
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Documento con la tabla de valores de rescate para planes de 300 meses"
                 >
                   <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">TABLA DE RESCATE Y ENDOSO</span>
-                </a>
+                </button>
 
                 {/* 4. Botón SORTEO */}
-                <a
-                  href={`${import.meta.env.BASE_URL}sorteo.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
+                <button
+                  type="button"
+                  onClick={() => setActivePdf('/sorteo.pdf')}
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Información oficial sobre sorteos mensuales de Quiniela LOTBA S.E."
                 >
                   <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">SORTEO</span>
-                </a>
+                </button>
 
                 {/* 5. Botón PARTICIPACIÓN Y RENDIMIENTOS */}
-                <a
-                  href={`${import.meta.env.BASE_URL}participaciondelosresultados.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5"
+                <button
+                  type="button"
+                  onClick={() => setActivePdf('/participaciondelosresultados.pdf')}
+                  className="flex items-center gap-2.5 w-full rounded-xl bg-white/10 px-3.5 py-2.5 text-left text-[11px] font-bold text-white transition hover:bg-white/20 hover:text-[#93c46d] border border-white/5 cursor-pointer"
                   title="Participación de los Titulares en los resultados de las reservas matemáticas"
                 >
                   <FileText size={15} className="text-[#93c46d] shrink-0" />
                   <span className="truncate">PARTICIPACIÓN Y RENDIMIENTOS</span>
-                </a>
+                </button>
               </div>
             </div>
 
@@ -1637,14 +1652,13 @@ function App() {
             </div>
 
             <div className="mt-6 space-y-3">
-              <a
-                href={`${import.meta.env.BASE_URL}titulo.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-[#1d497f] bg-white py-2.5 px-4 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/5"
+              <button
+                type="button"
+                onClick={() => setActivePdf('/titulo.pdf')}
+                className="flex items-center justify-center gap-2 w-full rounded-xl border-2 border-[#1d497f] bg-white py-2.5 px-4 text-[13px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/5 cursor-pointer"
               >
                 <FileText size={16} /> Ver Modelo de Título de Capitalización (PDF)
-              </a>
+              </button>
 
               <button
                 type="button"
@@ -1773,6 +1787,52 @@ function App() {
                   Aceptar
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ========================================================================= */}
+      {/* MODAL: VISOR PDF EN MODAL INTERNO (Pop-up interactivo)                    */}
+      {/* ========================================================================= */}
+      <AnimatePresence>
+        {activePdf && (
+          <div
+            className="fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 backdrop-blur-xs"
+            onClick={() => setActivePdf(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-full max-w-4xl h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border border-slate-200"
+            >
+              {/* Cabecera con estética idéntica al modal de Bases y Condiciones */}
+              <div className="flex items-center justify-between bg-[#383838] px-5 py-4 text-white shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <FileText size={18} className="text-[#93c46d]" />
+                  <h2 className="text-[13px] sm:text-[14px] font-extrabold uppercase tracking-wider text-slate-100">
+                    {getPdfTitle(activePdf)}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActivePdf(null)}
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-300 hover:bg-white/15 hover:text-white transition cursor-pointer"
+                  aria-label="Cerrar modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Contenido (El Visor) */}
+              <iframe
+                src={getPdfSrc(activePdf)}
+                className="w-full flex-grow border-none"
+                title="Documento Legal"
+              />
             </motion.div>
           </div>
         )}
