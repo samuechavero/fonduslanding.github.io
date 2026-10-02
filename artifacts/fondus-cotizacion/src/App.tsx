@@ -20,6 +20,7 @@ import {
   MessageCircle,
   Music2,
   Phone,
+  RefreshCw,
   Send,
   ShieldCheck,
   Sparkles,
@@ -236,15 +237,29 @@ function IgjCertificationBlock({ className = '' }: { className?: string }) {
 }
 
 // 1. Logo con subtítulo "Agencia Digital" estrictamente debajo del logo
-function Logo({ light = false }: { light?: boolean }) {
+function Logo({
+  light = false,
+  onClick,
+}: {
+  light?: boolean;
+  onClick?: () => void;
+}) {
   const logoUrl = `${import.meta.env.BASE_URL}fondus-logo.png`;
   return (
-    <div className="flex flex-col items-start leading-none group">
+    <div
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
+      className={`flex flex-col items-start leading-none group select-none ${
+        onClick ? 'cursor-pointer transition-transform duration-150 active:scale-95' : ''
+      }`}
+    >
       <div className={`flex items-center gap-2.5 ${light ? 'text-white' : 'text-[#1d497f]'}`}>
         <img
           src={logoUrl}
           alt="Fondus Logo"
-          className="h-9 w-9 rounded-xl object-contain shadow-xs border border-white/20"
+          className="h-9 w-9 rounded-xl object-contain shadow-xs border border-white/20 transition group-hover:scale-105"
         />
         <span className="font-display text-[26px] font-extrabold tracking-[-0.06em]">fondus</span>
       </div>
@@ -441,7 +456,12 @@ function AdjudicationBanner({
 }
 
 function Stepper({ step, setStep }: { step: number; setStep: (step: number) => void }) {
-  const steps = ['1. Elegí tu plan', '2. Datos Personales', '3. Revisión y Checkout'];
+  const steps = [
+    '1. Elegí tu plan',
+    '2. Datos Personales',
+    '3. Método de Pago',
+    '4. Revisión y Confirmación',
+  ];
   return (
     <div className="mb-8 w-full max-w-full flex items-center gap-1.5 overflow-x-auto whitespace-nowrap snap-x hide-scrollbar rounded-2xl border border-[#1d497f]/15 bg-white p-1.5 shadow-xs">
       {steps.map((name, index) => {
@@ -592,16 +612,24 @@ function App() {
   const [selectedPlan, setSelectedPlan] = useState(plans[1]); // Plan 10M destacado por defecto
   const [mobileMenu, setMobileMenu] = useState(false);
 
-  // 4. Números de 3 cifras generados dinámicamente
-  const [dynamicNumbers] = useState<string[]>(() => {
+  // 4. Números de 3 cifras generados dinámicamente con regeneración
+  const generateThreeNumbers = () => {
     const nums: string[] = [];
     while (nums.length < 3) {
       const n = String(Math.floor(100 + Math.random() * 900));
       if (!nums.includes(n)) nums.push(n);
     }
     return nums;
-  });
-  const [selectedNumber, setSelectedNumber] = useState<string>(dynamicNumbers[0]);
+  };
+
+  const [dynamicNumbers, setDynamicNumbers] = useState<string[]>(generateThreeNumbers);
+  const [selectedNumber, setSelectedNumber] = useState<string>(() => dynamicNumbers[0]);
+
+  const handleRegenerateNumbers = () => {
+    const newNums = generateThreeNumbers();
+    setDynamicNumbers(newNums);
+    setSelectedNumber(newNums[0]);
+  };
 
   // Checkboxes obligatorios en checkout
   const [checkCapitalizacion, setCheckCapitalizacion] = useState(false);
@@ -708,6 +736,51 @@ function App() {
     setFormState((current) => ({ ...current, [key]: value }));
   };
 
+  // Paso 3: Formulario de Método de Pago (Débito Automático)
+  const [paymentForm, setPaymentForm] = useState({
+    cardNumberOrCbu: '',
+    cardHolder: '',
+    expiry: '',
+    cvv: '',
+  });
+  const [paymentError, setPaymentError] = useState(false);
+
+  const setPaymentField = (key: string, value: string) => {
+    setPaymentForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // 5. Navegación Cíclica (Reset del Embudo al Paso 1 y scroll suave al inicio)
+  const handleResetToHome = () => {
+    setStep(0);
+    setSuccessModalOpen(false);
+    setRetentionModalOpen(false);
+    setTermsModalOpen(false);
+    setCheckCapitalizacion(false);
+    setCheckBasesCondiciones(false);
+    setCheckoutError(false);
+    setFormError(false);
+    setPaymentError(false);
+    setFormState({
+      nombre: '',
+      apellido: '',
+      dni: '',
+      fechaNacimiento: '',
+      estadoCivil: 'Soltero',
+      whatsapp: '',
+      email: '',
+    });
+    setPaymentForm({
+      cardNumberOrCbu: '',
+      cardHolder: '',
+      expiry: '',
+      cvv: '',
+    });
+    const newNums = generateThreeNumbers();
+    setDynamicNumbers(newNums);
+    setSelectedNumber(newNums[0]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Formulario de arrepentimiento para email a Fondus
   const [arrepentimientoForm, setArrepentimientoForm] = useState({
     nombre: '',
@@ -717,7 +790,7 @@ function App() {
     motivo: '',
   });
 
-  const progress = useMemo(() => `${((step + 1) / 3) * 100}%`, [step]);
+  const progress = useMemo(() => `${((step + 1) / 4) * 100}%`, [step]);
 
   // 2. Manejo de avance y retroceso del stepper
   const handleNext = () => {
@@ -726,7 +799,7 @@ function App() {
       setStep(1);
       window.scrollTo({ top: 350, behavior: 'smooth' });
     } else if (step === 1) {
-      // Paso 2 -> Pop-up de Retención antes del Checkout
+      // Paso 2 -> Pop-up de Retención antes del Método de Pago
       if (
         !form.nombre.trim() ||
         !form.apellido.trim() ||
@@ -738,10 +811,31 @@ function App() {
         return;
       }
       setFormError(false);
+      // Pre-completar titular si está vacío
+      if (!paymentForm.cardHolder.trim()) {
+        setPaymentForm((prev) => ({
+          ...prev,
+          cardHolder: `${form.nombre.trim()} ${form.apellido.trim()}`,
+        }));
+      }
       // Muestra el Pop-up de Retención obligatorio
       setRetentionModalOpen(true);
     } else if (step === 2) {
-      // Paso 3: Validación de Checkboxes Obligatorios
+      // Paso 3 -> Paso 4 (Revisión y Confirmación)
+      if (
+        !paymentForm.cardNumberOrCbu.trim() ||
+        !paymentForm.cardHolder.trim() ||
+        !paymentForm.expiry.trim() ||
+        !paymentForm.cvv.trim()
+      ) {
+        setPaymentError(true);
+        return;
+      }
+      setPaymentError(false);
+      setStep(3);
+      window.scrollTo({ top: 350, behavior: 'smooth' });
+    } else if (step === 3) {
+      // Paso 4: Validación de Checkboxes Obligatorios
       if (!checkCapitalizacion || !checkBasesCondiciones) {
         setCheckoutError(true);
         return;
@@ -756,9 +850,15 @@ function App() {
     setStep((prev) => Math.max(0, prev - 1));
   };
 
-  // Al aceptar en el Pop-up de Retención, avanza directamente a la Sección 3 (Checkout)
+  // Al aceptar en el Pop-up de Retención, avanza a la Sección 3 (Método de Pago)
   const handleProceedFromRetention = () => {
     setRetentionModalOpen(false);
+    if (!paymentForm.cardHolder.trim()) {
+      setPaymentForm((prev) => ({
+        ...prev,
+        cardHolder: `${form.nombre.trim()} ${form.apellido.trim()}`,
+      }));
+    }
     setStep(2);
     window.scrollTo({ top: 350, behavior: 'smooth' });
   };
@@ -822,13 +922,11 @@ function App() {
   ];
 
   return (
-    <div className="fondus-page min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-50 text-[#1d497f]">
+    <div className="fondus-page min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-white text-[#1d497f]">
       {/* Header Institucional con padding horizontal uniforme */}
       <header className="sticky top-0 z-20 w-full border-b border-[#1d497f]/10 bg-white/95 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
         <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between gap-4">
-          <a href="#inicio" aria-label="Fondus inicio">
-            <Logo />
-          </a>
+          <Logo onClick={handleResetToHome} />
           <nav className="hidden items-center gap-6 lg:flex">
             {['Nosotros', 'Planes', 'Productos', 'Preguntas frecuentes'].map((link) => (
               <a
@@ -840,23 +938,49 @@ function App() {
               </a>
             ))}
             <a
-              href="#ingresar"
+              href="https://autogestion.fondus.com.ar"
+              target="_blank"
+              rel="noopener noreferrer"
               className="border-l border-slate-200 pl-6 text-[11px] font-bold uppercase tracking-[.08em] text-[#1d497f] transition hover:text-[#93c46d]"
             >
               Ingresar
             </a>
           </nav>
           <div className="hidden items-center gap-3 text-[#1d497f] sm:flex">
-            <a href="#facebook" aria-label="Facebook" className="transition hover:text-[#93c46d]">
+            <a
+              href="https://www.facebook.com/fondus.ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="transition hover:text-[#93c46d]"
+            >
               <Facebook size={16} />
             </a>
-            <a href="#instagram" aria-label="Instagram" className="transition hover:text-[#93c46d]">
+            <a
+              href="https://www.instagram.com/fondus.ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="transition hover:text-[#93c46d]"
+            >
               <Instagram size={16} />
             </a>
-            <a href="#whatsapp" aria-label="WhatsApp" className="transition hover:text-[#93c46d]">
+            <a
+              href="https://wa.me/5491136906233"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+              className="transition hover:text-[#93c46d]"
+            >
               <MessageCircle size={16} />
             </a>
-            <a href="#tiktok" aria-label="TikTok" className="transition hover:text-[#93c46d]">
+            <a
+              href="https://www.tiktok.com/@fondus.ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              className="transition hover:text-[#93c46d]"
+            >
               <Music2 size={16} />
             </a>
           </div>
@@ -879,24 +1003,68 @@ function App() {
         {mobileMenu && (
           <div className="border-t border-slate-100 bg-white py-4 px-4 lg:hidden">
             <div className="grid gap-3 text-[12px] font-bold uppercase tracking-[.08em] text-[#1d497f]">
-              {['Nosotros', 'Planes', 'Productos', 'Preguntas frecuentes', 'Ingresar'].map(
-                (link) => (
-                  <a
-                    key={link}
-                    href={`#${link.toLowerCase().replaceAll(' ', '-')}`}
-                    onClick={() => setMobileMenu(false)}
-                  >
-                    {link}
-                  </a>
-                )
-              )}
+              {['Nosotros', 'Planes', 'Productos', 'Preguntas frecuentes'].map((link) => (
+                <a
+                  key={link}
+                  href={`#${link.toLowerCase().replaceAll(' ', '-')}`}
+                  onClick={() => setMobileMenu(false)}
+                >
+                  {link}
+                </a>
+              ))}
+              <a
+                href="https://autogestion.fondus.com.ar"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenu(false)}
+              >
+                Ingresar
+              </a>
+              <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-[#1d497f]">
+                <a
+                  href="https://www.facebook.com/fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Facebook size={18} />
+                </a>
+                <a
+                  href="https://www.instagram.com/fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Instagram size={18} />
+                </a>
+                <a
+                  href="https://wa.me/5491136906233"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <MessageCircle size={18} />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Music2 size={18} />
+                </a>
+              </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Main Container con overflow-x-hidden preventivo */}
-      <main id="inicio" className="w-full max-w-full overflow-x-hidden bg-grid">
+      {/* Main Container con overflow-x-hidden y fondo liso */}
+      <main id="inicio" className="w-full max-w-full overflow-x-hidden bg-white">
         <div className="mx-auto w-full max-w-[1380px] px-4 pb-16 pt-8 sm:px-6 sm:pt-14 lg:px-10 lg:pt-20">
           {/* Encabezado: Badge "Adhesión digital" y Título "Sumate a Fondus" */}
           <div className="mb-10 max-w-[740px] animate-rise">
@@ -927,8 +1095,8 @@ function App() {
               La caja de 'Resumen' SÓLO debe ser visible en el Paso 3 (Revisión y Checkout).
               ELIMINA por completo el cuadro lateral de 'Dudas sobre el plan'. */}
           <div id="cotizar" className="mt-12 w-full max-w-full">
-            {step < 2 ? (
-              /* Pasos 1 y 2: Formulario centrado limpio sin caja lateral de resumen */
+            {step < 3 ? (
+              /* Pasos 1, 2 y 3: Formulario centrado limpio sin caja lateral de resumen */
               <div className="max-w-4xl mx-auto">
                 <Stepper step={step} setStep={setStep} />
 
@@ -940,7 +1108,7 @@ function App() {
                     />
                   </div>
                   <span className="font-mono-ui text-[11px] font-bold text-[#1d497f]">
-                    0{step + 1} / 03
+                    0{step + 1} / 04
                   </span>
                 </div>
 
@@ -1051,8 +1219,92 @@ function App() {
                   </div>
                 )}
 
-                {/* 2. Botones de Navegación del Stepper (SÓLO visible en Paso 2: Datos Personales) */}
-                {step === 1 && (
+                {/* SECCIÓN 3: MÉTODO DE PAGO (DÉBITO AUTOMÁTICO) */}
+                {step === 2 && (
+                  <div className="animate-rise space-y-6 w-full max-w-full">
+                    <section className="w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:p-6 lg:p-7">
+                      <SectionHeading
+                        number="03"
+                        title="Método de Pago"
+                        caption="Ingresá los datos para la adhesión al débito automático."
+                        icon={<CreditCard size={18} />}
+                      />
+
+                      {/* Candado de seguridad con leyenda destacada */}
+                      <div className="mb-6 flex items-center gap-3.5 rounded-2xl bg-[#1d497f]/5 border border-[#1d497f]/15 p-4 text-[#1d497f]">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1d497f] text-white shadow-xs">
+                          <LockKeyhole size={20} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13.5px] font-bold text-[#1d497f]">
+                              Carga segura de datos
+                            </span>
+                            <span className="rounded-full bg-[#93c46d]/20 border border-[#93c46d]/40 px-2 py-0.5 text-[9.5px] font-extrabold uppercase text-[#1d497f]">
+                              SSL 256-bit
+                            </span>
+                          </div>
+                          <p className="text-[12px] text-slate-500 leading-snug mt-0.5">
+                            Tus datos se transmiten mediante conexión cifrada y se resguardan bajo estrictas normas de seguridad bancaria.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Campos requeridos de pago */}
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <Field
+                          label="Número de Tarjeta de Crédito / CBU"
+                          placeholder="Ej: 4509 ... o CBU de 22 dígitos"
+                          value={paymentForm.cardNumberOrCbu}
+                          onChange={(val) => setPaymentField('cardNumberOrCbu', val)}
+                          icon={<CreditCard size={16} />}
+                          className="sm:col-span-2"
+                        />
+                        <Field
+                          label="Nombre del Titular"
+                          placeholder="Como figura en la tarjeta o cuenta"
+                          value={paymentForm.cardHolder}
+                          onChange={(val) => setPaymentField('cardHolder', val)}
+                          icon={<UserRound size={16} />}
+                          className="sm:col-span-2"
+                        />
+                        <Field
+                          label="Fecha de Vencimiento (MM/AA)"
+                          placeholder="MM/AA"
+                          value={paymentForm.expiry}
+                          onChange={(val) => {
+                            let formatted = val.replace(/[^\d]/g, '');
+                            if (formatted.length > 2) {
+                              formatted = `${formatted.slice(0, 2)}/${formatted.slice(2, 4)}`;
+                            }
+                            setPaymentField('expiry', formatted.slice(0, 5));
+                          }}
+                          icon={<Clock3 size={16} />}
+                        />
+                        <Field
+                          label="Código de Seguridad (CVV)"
+                          placeholder="Ej: 123"
+                          type="password"
+                          value={paymentForm.cvv}
+                          onChange={(val) =>
+                            setPaymentField('cvv', val.replace(/[^\d]/g, '').slice(0, 4))
+                          }
+                          icon={<LockKeyhole size={16} />}
+                        />
+                      </div>
+
+                      {paymentError && (
+                        <div className="mt-4 flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-[12px] font-semibold text-amber-800 animate-shake">
+                          <AlertCircle size={16} className="text-amber-600 shrink-0" />
+                          <span>Por favor, completá todos los campos del método de pago para continuar.</span>
+                        </div>
+                      )}
+                    </section>
+                  </div>
+                )}
+
+                {/* 2. Botones de Navegación del Stepper (Paso 2 y Paso 3) */}
+                {step > 0 && (
                   <div className="mt-8 flex items-center justify-between gap-3 pt-4 border-t border-slate-200">
                     <button
                       type="button"
@@ -1078,7 +1330,7 @@ function App() {
                 </p>
               </div>
             ) : (
-              /* Paso 3: Revisión y Checkout con 2 columnas (Resumen en columna derecha) */
+              /* Paso 4: Revisión y Confirmación con 2 columnas (Resumen en columna derecha) */
               <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(315px,.85fr)] lg:gap-10">
                 <section className="w-full min-w-0">
                   <Stepper step={step} setStep={setStep} />
@@ -1091,16 +1343,16 @@ function App() {
                       />
                     </div>
                     <span className="font-mono-ui text-[11px] font-bold text-[#1d497f]">
-                      03 / 03
+                      04 / 04
                     </span>
                   </div>
 
-                  {/* SECCIÓN 3: REVISIÓN Y CHECKOUT */}
+                  {/* SECCIÓN 4: REVISIÓN Y CONFIRMACIÓN */}
                   <div className="animate-rise space-y-6 w-full max-w-full">
                     <section className="w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-xs sm:p-6 lg:p-7">
                       <SectionHeading
-                        number="03"
-                        title="Revisión y Checkout"
+                        number="04"
+                        title="Revisión y Confirmación"
                         caption="Confirmá tu adhesión con suscripción bonificada."
                         icon={<ShieldCheck size={18} />}
                       />
@@ -1151,11 +1403,46 @@ function App() {
                         </div>
                       </div>
 
-                      {/* 4. Selector de número de participación (3 cifras dinámicas) */}
+                      {/* Resumen de débito automático */}
+                      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 flex items-center justify-between text-[13px]">
+                        <div className="flex items-center gap-2.5">
+                          <CreditCard size={18} className="text-[#1d497f]" />
+                          <div>
+                            <span className="block font-bold text-[#1d497f]">
+                              Débito Automático:{' '}
+                              {paymentForm.cardNumberOrCbu.length >= 4
+                                ? `•••• ${paymentForm.cardNumberOrCbu.replace(/\s+/g, '').slice(-4)}`
+                                : 'Registrado'}
+                            </span>
+                            <span className="block text-[11px] text-slate-500">
+                              Titular: {paymentForm.cardHolder}
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setStep(2)}
+                          className="text-[11px] font-bold text-[#1d497f] underline hover:text-[#93c46d] cursor-pointer"
+                        >
+                          Modificar
+                        </button>
+                      </div>
+
+                      {/* 4. Selector de número de participación (3 cifras dinámicas) con regeneración */}
                       <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4.5">
-                        <label className="block text-[13px] font-bold text-[#1d497f] mb-3">
-                          Elegí tu número para participar del sorteo de la adjudicación:
-                        </label>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                          <label className="block text-[13px] font-bold text-[#1d497f]">
+                            Elegí tu número para participar del sorteo de la adjudicación:
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleRegenerateNumbers}
+                            className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-xl border border-[#1d497f] bg-transparent px-3 py-1.5 text-[11px] font-bold text-[#1d497f] transition hover:bg-[#1d497f]/10 cursor-pointer"
+                          >
+                            <RefreshCw size={13} />
+                            <span>Volver a generar otros números</span>
+                          </button>
+                        </div>
                         <div className="grid grid-cols-3 gap-3">
                           {dynamicNumbers.map((num) => (
                             <button
@@ -1311,6 +1598,15 @@ function App() {
                             $ 0 (Bonificada)
                           </strong>
                         </div>
+                        <div className="flex justify-between items-center text-[13px] text-slate-600">
+                          <span className="font-medium">Medio de pago:</span>
+                          <strong className="text-[#1d497f] font-bold text-right flex items-center gap-1.5">
+                            <CreditCard size={13} className="text-[#1d497f]" />
+                            {paymentForm.cardNumberOrCbu.length >= 4
+                              ? `•••• ${paymentForm.cardNumberOrCbu.replace(/\s+/g, '').slice(-4)}`
+                              : 'Débito Automático'}
+                          </strong>
+                        </div>
                       </div>
 
                       {/* Total primer pago */}
@@ -1420,7 +1716,7 @@ function App() {
         <div className="mx-auto max-w-[1220px] px-5 py-14 sm:px-8">
           <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1.2fr_1.2fr] lg:gap-8">
             <div>
-              <Logo light />
+              <Logo light onClick={handleResetToHome} />
               <p className="mt-5 max-w-[240px] text-[13px] leading-relaxed text-white/70">
                 Capitalización clara, con el respaldo que necesitás para proyectar lo que sigue.
               </p>
@@ -1431,6 +1727,44 @@ function App() {
                 <p className="flex items-center gap-2">
                   <Phone size={14} className="text-[#93c46d]" /> 0810 345 6638
                 </p>
+              </div>
+              <div className="mt-5 flex items-center gap-3.5 text-white/80">
+                <a
+                  href="https://www.facebook.com/fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Facebook size={18} />
+                </a>
+                <a
+                  href="https://www.instagram.com/fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Instagram size={18} />
+                </a>
+                <a
+                  href="https://wa.me/5491136906233"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <MessageCircle size={18} />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@fondus.ar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="transition hover:text-[#93c46d]"
+                >
+                  <Music2 size={18} />
+                </a>
               </div>
             </div>
 
@@ -1613,18 +1947,34 @@ function App() {
       {successModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-rise">
           <div className="relative w-full max-w-[520px] rounded-3xl bg-white p-7 sm:p-9 text-center shadow-2xl border-2 border-[#93c46d]">
-            <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm overflow-hidden border border-[#93c46d]/40 bg-white">
-              <img
-                src={`${import.meta.env.BASE_URL}fondus-logo.png`}
-                alt="Fondus"
-                className="h-full w-full object-contain"
-              />
-              <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#93c46d] text-[#1d497f] shadow-xs">
-                <Check size={14} strokeWidth={3} />
-              </span>
+            <div className="flex flex-col items-center justify-center mb-2">
+              <div
+                onClick={handleResetToHome}
+                className="cursor-pointer group flex flex-col items-center select-none transition-transform duration-150 active:scale-95"
+                title="Toca acá para ir al inicio"
+                role="button"
+                tabIndex={0}
+              >
+                <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm overflow-hidden border border-[#93c46d]/40 bg-white transition group-hover:scale-105">
+                  <img
+                    src={`${import.meta.env.BASE_URL}fondus-logo.png`}
+                    alt="Fondus"
+                    className="h-full w-full object-contain"
+                  />
+                  <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#93c46d] text-[#1d497f] shadow-xs">
+                    <Check size={14} strokeWidth={3} />
+                  </span>
+                </div>
+                <span className="mt-2 font-display text-[22px] font-extrabold tracking-[-0.06em] text-[#1d497f]">
+                  fondus
+                </span>
+                <span className="text-[9px] font-extrabold tracking-[.25em] uppercase text-[#1d497f]/70 -mt-1">
+                  Agencia Digital
+                </span>
+              </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-3">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[#93c46d]/20 border border-[#93c46d] px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[.1em] text-[#1d497f]">
                 <Sparkles size={13} className="text-[#93c46d]" /> Adhesión Exitosa
               </span>
@@ -1663,6 +2013,14 @@ function App() {
                     {formatMoney(selectedPlan.quota1to4)}
                   </strong>
                 </div>
+                <div className="flex justify-between py-1 border-b border-slate-200">
+                  <span className="text-slate-500 font-medium">Medio de pago:</span>
+                  <strong className="text-[#1d497f] font-bold">
+                    {paymentForm.cardNumberOrCbu.length >= 4
+                      ? `•••• ${paymentForm.cardNumberOrCbu.replace(/\s+/g, '').slice(-4)}`
+                      : 'Débito Automático'}
+                  </strong>
+                </div>
                 <div className="flex justify-between py-1">
                   <span className="text-slate-500 font-medium">Suscripción digital:</span>
                   <strong className="text-[#93c46d] font-bold uppercase">
@@ -1683,15 +2041,11 @@ function App() {
 
               <button
                 type="button"
-                onClick={() => {
-                  setSuccessModalOpen(false);
-                  setStep(0);
-                  setCheckCapitalizacion(false);
-                  setCheckBasesCondiciones(false);
-                }}
-                className="w-full rounded-xl bg-[#93c46d] hover:bg-[#82b35c] py-3 px-4 text-[13px] font-bold text-[#1d497f] shadow-md transition cursor-pointer"
+                onClick={handleResetToHome}
+                className="w-full rounded-xl bg-[#93c46d] hover:bg-[#82b35c] py-3.5 px-4 text-[14px] font-bold text-[#1d497f] shadow-md transition cursor-pointer flex items-center justify-center gap-2"
               >
-                Entendido, ir al inicio
+                <span>Toca acá para ir al inicio</span>
+                <ArrowRight size={16} />
               </button>
             </div>
           </div>

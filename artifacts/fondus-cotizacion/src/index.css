@@ -145,10 +145,6 @@
   .font-display { font-family: var(--app-font-serif); }
   .font-mono-ui { font-family: var(--app-font-mono); }
   .text-balance { text-wrap: balance; }
-  .bg-grid {
-    background-image: linear-gradient(rgba(29, 73, 127, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(29, 73, 127, 0.045) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
   .bg-fondus-blue { background-color: #1d497f; }
   .text-fondus-blue { color: #1d497f; }
   .border-fondus-blue { border-color: #1d497f; }
